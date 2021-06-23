@@ -22,18 +22,25 @@ namespace truyenthanhServerWeb.Models
         string pathSong = @"Data"; //combine with username in constructor
         List<string> lSong = new List<string>();
 
+        public List<byte[]> lBuffer = new List<byte[]>();
         public byte[] bbuuff;
-        
+
         public User(Account _account)
         {
             account = _account;
-            bbuuff = new byte[250000000];
-            for (int i = 0; i < bbuuff.Length; i++) bbuuff[i] = (byte)i;
+
+            for(int j = 0; j < 300000; j++)
+            {
+                var tmpbuff = new byte[1000];
+                for (int i = 0; i < tmpbuff.Length; i++) bbuuff[i] = (byte)i;
+                lBuffer.Add(tmpbuff);
+            }
         }
 
         public void killUser()
         {
             bbuuff = null;
+            lBuffer.Clear();
         }
     }
 }
