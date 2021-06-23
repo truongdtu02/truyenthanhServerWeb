@@ -27,7 +27,7 @@ namespace truyenthanhServerWeb.Models
         public User(Account _account)
         {
             account = _account;
-            bbuuff = new byte[100000000];
+            bbuuff = new byte[250000000];
             for (int i = 0; i < bbuuff.Length; i++) bbuuff[i] = (byte)i;
         }
     }
