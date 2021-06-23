@@ -1,0 +1,159 @@
+﻿@using truyenthanhServerWeb.Services
+@using truyenthanhServerWeb.Models
+@using System.ComponentModel.DataAnnotations;
+
+@inject AccountService _accountService
+@implements IDisposable
+
+@code{
+    //[Parameter]
+    //public TodoItemService Service2 { get; set; }
+
+    private List<Account> _data;
+    //[Required, MinLength(4), MaxLength(20)]
+    private string _inputUsername;
+    //[Required, MinLength(8), MaxLength(20)]
+    private string _inputPassword;
+    private string _editId = null;
+
+    private bool bDuplicateUser = false; //show error duplicate username
+
+    protected override void OnInitialized()
+    {
+        _data = _accountService.Get();
+
+        // Subscription to database record change events
+        AccountService.AccountChanged += UpdateNewData;
+
+        Console.WriteLine("Hello");
+    }
+
+    // The event handler, will update the HTML view according to new stock value
+    private async void UpdateNewData(object sender, AccountChangedEventArgs args)
+    {
+        if (args.NewValue != null)
+        {
+            _data = args.NewValue;
+            Console.WriteLine("new update");
+            await InvokeAsync(() =>
+            {
+                base.StateHasChanged();
+            });
+        }
+    }
+
+    private void Add()
+    {
+        bDuplicateUser = false;
+        Console.WriteLine("add");
+        if (!string.IsNullOrWhiteSpace(_inputUsername) && !string.IsNullOrWhiteSpace(_inputPassword))
+        {
+            //check duplicate username
+            //if(_data.Exists(ac => ac.Username == _inputUsername))
+            //{
+            //    bDuplicateUser = true;
+            //    _inputPassword = null; _inputUsername = null; //clear UI
+            //    return;
+            //}
+
+            var tmpAcc = new Account() { Username = _inputUsername, Password = _inputPassword };
+            _inputPassword = null; _inputUsername = null; //clear UI
+            _data.Add(tmpAcc);
+            _accountService.Create(tmpAcc);
+        }
+    }
+
+    //private void Clear() => _data.RemoveAll(i => i.Done);
+
+    //private void ClearAll() => _data.Clear();
+
+    //private void DoTheThing(KeyboardEventArgs eventArgs)
+    //{
+    //    if (eventArgs.Key == "Enter")        // fire on enter
+    //    {
+    //        Add();
+    //    }
+    //}
+
+    //private void Save() => Service.SaveChanges(_data);
+
+    private void Edit(Account editAccount)
+    {
+        _editId = editAccount.Id;
+    }
+
+    private void Save(Account editAccount)
+    {
+         _accountService.Update(editAccount.Id, editAccount);
+        _editId = null;
+    }
+
+    private void Remove(Account editAccount)
+    {
+        _data.Remove(editAccount);
+        _accountService.Remove(editAccount.Id);
+    }
+
+    public void Dispose()
+    {
+        AccountService.AccountChanged -= UpdateNewData;
+    }
+}
+
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <button @onclick="Add" class="btn btn-outline-success" type="button">Add</button>
+    </div>
+    <input @bind="_inputUsername" type="text" class="form-control" placeholder="Username 4-20 chars" />
+    <span asp-validation-for="_inputUser" class="text-danger small"></span>
+
+    <input @bind="_inputPassword" type="text" class="form-control" placeholder="Password 8-20 chars" />
+    <span asp-validation-for="_current" class="text-danger small"></span>
+
+</div>
+
+<h4 hidden="@(!bDuplicateUser)" class="text-warning">Duplicate username</h4>
+
+@*<div class="input-group mb-5">
+    <div class="input-group-append">
+        <label>Username</label>
+    </div>
+    <div class="input-group-append">
+        <label>Password</label>
+    </div>
+    <div class="input-group-append">
+    </div>
+    <div class="input-group-append">
+    </div>
+    <div class="input-group-append">
+    </div>
+</div>*@
+
+<ol class="list-group">
+    @foreach (var i in _data)
+    {
+        <li>
+            <div class="input-group mb-5">
+                <div class="input-group-append">
+                    <input readonly="@(i.Id != _editId)" type="text" @bind="i.Username" class="form-control" placeholder="Todo" />
+                </div>
+                <div class="input-group-append">
+                    <input readonly="@(i.Id != _editId)" type="text" @bind="i.Password" class="form-control" placeholder="Note" />
+                </div>
+                <div class="input-group-append">
+                    <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i))">Edit</button>
+                </div>
+                <div class="input-group-append">
+                    <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
+                </div>
+            </div>
+        </li>
+    }
+</ol>
+
+@*<button hidden="true" @onclick="@(e => Save(_data[0]))" class="btn btn-outline-danger">Remove selected</button>
+<button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
+<button @onclick="Save" class="btn btn-outline-primary">Save</button>*@

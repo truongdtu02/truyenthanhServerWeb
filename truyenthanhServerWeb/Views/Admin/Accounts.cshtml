@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewData["Title"] = "Account Edit";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Account management</h1>
+</div>
+
+<div>
+    @(await Html.RenderComponentAsync<truyenthanhServerWeb.Components.AccountAdmin>(RenderMode.ServerPrerendered))
+</div>
+
