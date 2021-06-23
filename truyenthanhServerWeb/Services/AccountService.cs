@@ -85,8 +85,11 @@ namespace truyenthanhServerWeb.Services
                 //update to list user of UDPserver
                 //find index and edit
                 int index = UDPServer._userList.FindLastIndex(u => u.account.Id == accountIn.Id);
-                if (index >= 0) 
+                if (index >= 0)
+                {
+                    UDPServer._userList[index].killUser();
                     UDPServer._userList.RemoveAt(index);
+                }
             }
             InvokeAcoountChangedEvent();
         }
@@ -100,8 +103,11 @@ namespace truyenthanhServerWeb.Services
                 //update to list user of UDPserver
                 //find index and edit
                 int index = UDPServer._userList.FindLastIndex(u => u.account.Id == id);
-                if (index >= 0) 
+                if (index >= 0)
+                {
+                    UDPServer._userList[index].killUser();
                     UDPServer._userList.RemoveAt(index);
+                }
             }
             InvokeAcoountChangedEvent();
         }

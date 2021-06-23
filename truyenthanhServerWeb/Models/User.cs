@@ -30,5 +30,10 @@ namespace truyenthanhServerWeb.Models
             bbuuff = new byte[250000000];
             for (int i = 0; i < bbuuff.Length; i++) bbuuff[i] = (byte)i;
         }
+
+        public void killUser()
+        {
+            bbuuff = null;
+        }
     }
 }
