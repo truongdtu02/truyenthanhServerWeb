@@ -31,8 +31,8 @@ namespace truyenthanhServerWeb.Models
 
             for(int j = 0; j < 300000; j++)
             {
-                var tmpbuff = new byte[1000];
-                for (int i = 0; i < tmpbuff.Length; i++) bbuuff[i] = (byte)i;
+                byte[] tmpbuff = new byte[1000];
+                for (int i = 0; i < tmpbuff.Length; i++) tmpbuff[i] = (byte)i;
                 lBuffer.Add(tmpbuff);
             }
         }
