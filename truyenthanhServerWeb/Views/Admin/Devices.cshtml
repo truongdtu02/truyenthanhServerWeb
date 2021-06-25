@@ -1,0 +1,15 @@
+﻿@model truyenthanhServerWeb.Models.User
+@{
+    ViewData["Title"] = "Device Edit";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Device management</h1>
+</div>
+
+@*<div>
+    @(await Html.RenderComponentAsync<truyenthanhServerWeb.Components.DeviceAdmin>(RenderMode.ServerPrerendered, new {_user = ViewData["user"]}))
+</div>*@
+
+<component type="typeof(DeviceAdmin)" render-mode="Server"/>
+

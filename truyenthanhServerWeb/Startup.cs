@@ -37,8 +37,9 @@ namespace truyenthanhServerWeb
             services.AddServerSideBlazor();
             services.AddControllersWithViews();
 
-            //DI for AccountService
+            //DI for AccountService, DeviceService
             services.AddSingleton<AccountService>();
+            services.AddSingleton<DeviceService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,8 +53,6 @@ namespace truyenthanhServerWeb
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
-            app.UseBlazorFrameworkFiles(); // add this
 
             app.UseStaticFiles();
 

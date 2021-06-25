@@ -1,0 +1,158 @@
+﻿@using truyenthanhServerWeb.Services
+@using truyenthanhServerWeb.Models
+@using System.ComponentModel.DataAnnotations;
+
+@inject DeviceService _deviceSerive
+@implements IDisposable
+
+@code{
+    private int userIndx;
+    private int userIndxInput;
+
+    private List<Device> _deviceList;
+    //[Required, MinLength(4), MaxLength(20)]
+    private string _inputName;
+    private string _inputId;
+    private string _editId = null;
+
+    private bool bDuplicateId = false; //show error duplicate username
+    private bool bOnInitialized = false;
+
+    protected override void OnInitialized()
+    {
+        //_deviceList = _user.lDevice;
+        //userIndx = _user.indx;
+        _editId = null;
+
+        // Subscription to database record change events
+        DeviceService.DeviceChanged += UpdateNewDevices;
+
+        //Console.WriteLine("Devices page");
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        await LoadData();
+    //    }
+    //}
+
+    // The event handler, will update the HTML view according to new stock value
+    private async void UpdateNewDevices(object sender, DeviceChangedEventArgs args)
+    {
+        _deviceList = _deviceSerive.GetByIndx(userIndx);
+        //Console.WriteLine("new update");
+        await InvokeAsync(() =>
+        {
+            base.StateHasChanged();
+        });
+    }
+
+    private void Submit()
+    {
+        _editId = null;
+        userIndx = userIndxInput;
+        _deviceList = _deviceSerive.GetByIndx(userIndx);
+    }
+
+    private void Add()
+    {
+        bDuplicateId = false;
+        //input ID is not required
+        if (!string.IsNullOrWhiteSpace(_inputName))
+        {
+            //check duplicate id
+            if (_deviceList != null && _deviceList.Exists(dv => dv.Id == _inputId))
+            {
+                bDuplicateId = true;
+                _inputId = null; _inputName = null; //clear UI
+                return;
+            }
+
+            var tmpDv = new Device() { Id = _inputId, Name = _inputName, OwnerIndx = userIndx };
+            _inputId = null; _inputName = null; //clear UI
+            //if (_deviceList == null) _deviceList = new List<Device>();
+            //_deviceList.Add(tmpDv);
+            _deviceSerive.Create(tmpDv);
+        }
+    }
+
+    private void Edit(string editId)
+    {
+        _editId = editId;
+    }
+
+    private void Save(Device editDevice)
+    {
+        _deviceSerive.Update(editDevice.Id, editDevice);
+        _editId = null;
+    }
+
+    private void Remove(Device editDevice)
+    {
+        //_deviceList.Remove(editDevice);
+
+        if (editDevice.Id == _editId) _editId = null;
+        _deviceSerive.Remove(editDevice);
+    }
+
+    public void Dispose()
+    {
+        //AccountService.AccountChanged -= UpdateNewData;
+    }
+}
+
+<div>
+    <label for="userIndx">STT user</label><br>
+    <input type="text" id="userIndx" @bind="userIndxInput" placeholder="STT user" />
+    <button @onclick="Submit" class="btn btn-outline-success" type="button">Submit</button>
+</div>
+
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <button @onclick="Add" class="btn btn-outline-success" type="button">Add</button>
+    </div>
+    <input @bind="_inputId" type="text" class="form-control" placeholder="Not necessary (24 chars)" />
+    <span asp-validation-for="_inputUser" class="text-danger small"></span>
+
+    <input @bind="_inputName" type="text" class="form-control" placeholder="Device name" />
+    <span asp-validation-for="_current" class="text-danger small"></span>
+
+</div>
+
+<h4 hidden="@(!bDuplicateId)" class="text-warning">Duplicate ID</h4>
+
+<ol class="list-group">
+
+    @{ if (_deviceList != null)
+        {
+            foreach (var i in _deviceList)
+            {
+                <li>
+                    <div class="input-group mb-5">
+                        <div class="input-group-append">
+                            <input readonly type="text" @bind="i.Id" class="form-control" placeholder="ID" />
+                        </div>
+                        <div class="input-group-append">
+                            <input readonly="@(i.Id != _editId)" type="text" @bind="i.Name" class="form-control" placeholder="Name" />
+                        </div>
+                        <div class="input-group-append">
+                            <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i.Id))">Edit</button>
+                        </div>
+                        <div class="input-group-append">
+                            <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
+                        </div>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
+                        </div>
+                    </div>
+                </li>
+            }
+        }
+    }
+</ol>
+
+@*<button hidden="true" @onclick="@(e => Save(_data[0]))" class="btn btn-outline-danger">Remove selected</button>
+    <button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
+    <button @onclick="Save" class="btn btn-outline-primary">Save</button>*@

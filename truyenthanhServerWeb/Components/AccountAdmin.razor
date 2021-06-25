@@ -25,7 +25,7 @@
         // Subscription to database record change events
         AccountService.AccountChanged += UpdateNewData;
 
-        Console.WriteLine("Hello");
+        //Console.WriteLine("Hello Admin page");
     }
 
     // The event handler, will update the HTML view according to new stock value
@@ -34,7 +34,7 @@
         if (args.NewValue != null)
         {
             _data = args.NewValue;
-            Console.WriteLine("new update");
+            //Console.WriteLine("new update");
             await InvokeAsync(() =>
             {
                 base.StateHasChanged();
@@ -45,20 +45,24 @@
     private void Add()
     {
         bDuplicateUser = false;
-        Console.WriteLine("add");
-        if (!string.IsNullOrWhiteSpace(_inputUsername) && !string.IsNullOrWhiteSpace(_inputPassword))
+        //Console.WriteLine("Add");
+        //if (!string.IsNullOrWhiteSpace(_inputUsername) && !string.IsNullOrWhiteSpace(_inputPassword))
+        if(_inputUsername.Length > 3 && _inputUsername.Length < 20
+            &&_inputPassword.Length > 7 && _inputPassword.Length < 20
+            && !_inputUsername.Contains(' ') && !_inputPassword.Contains(' '))
         {
             //check duplicate username
-            //if(_data.Exists(ac => ac.Username == _inputUsername))
-            //{
-            //    bDuplicateUser = true;
-            //    _inputPassword = null; _inputUsername = null; //clear UI
-            //    return;
-            //}
+            if (_data != null && _data.Exists(ac => ac.Username == _inputUsername))
+            {
+                bDuplicateUser = true;
+                _inputPassword = null; _inputUsername = null; //clear UI
+                return;
+            }
 
             var tmpAcc = new Account() { Username = _inputUsername, Password = _inputPassword };
             _inputPassword = null; _inputUsername = null; //clear UI
-            _data.Add(tmpAcc);
+            if (_data == null) _data = new List<Account>();
+            //_data.Add(tmpAcc);
             _accountService.Create(tmpAcc);
         }
     }
@@ -84,13 +88,15 @@
 
     private void Save(Account editAccount)
     {
-         _accountService.Update(editAccount.Id, editAccount);
+        _accountService.Update(editAccount.Id, editAccount);
         _editId = null;
     }
 
     private void Remove(Account editAccount)
     {
-        _data.Remove(editAccount);
+        //_data.Remove(editAccount);
+
+        if (editAccount.Id == _editId) _editId = null;
         _accountService.Remove(editAccount.Id);
     }
 
@@ -115,45 +121,49 @@
 <h4 hidden="@(!bDuplicateUser)" class="text-warning">Duplicate username</h4>
 
 @*<div class="input-group mb-5">
-    <div class="input-group-append">
-        <label>Username</label>
-    </div>
-    <div class="input-group-append">
-        <label>Password</label>
-    </div>
-    <div class="input-group-append">
-    </div>
-    <div class="input-group-append">
-    </div>
-    <div class="input-group-append">
-    </div>
-</div>*@
+        <div class="input-group-append">
+            <label>Username</label>
+        </div>
+        <div class="input-group-append">
+            <label>Password</label>
+        </div>
+        <div class="input-group-append">
+        </div>
+        <div class="input-group-append">
+        </div>
+        <div class="input-group-append">
+        </div>
+    </div>*@
 
-<ol class="list-group">
-    @foreach (var i in _data)
-    {
-        <li>
-            <div class="input-group mb-5">
-                <div class="input-group-append">
-                    <input readonly="@(i.Id != _editId)" type="text" @bind="i.Username" class="form-control" placeholder="Todo" />
+@*start from 0 to synchronize with index of user in _userList*@ 
+<ol class="list-group" start="0">
+    @{
+        int orderItem = 0;
+        foreach (var i in _data)
+        {
+            int curIndx = orderItem;
+            <li>
+                <div class="input-group mb-5">
+                    <div class="input-group-append">
+                        <input readonly="@(i.Id != _editId)" type="text" @bind="i.Username" class="form-control" placeholder="Username" />
+                    </div>
+                    <div class="input-group-append">
+                        <input readonly="@(i.Id != _editId)" type="text" @bind="i.Password" class="form-control" placeholder="Password" />
+                    </div>
+                    <div class="input-group-append">
+                        <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i))">Edit</button>
+                    </div>
+                    <div class="input-group-append">
+                        <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
+                    </div>
                 </div>
-                <div class="input-group-append">
-                    <input readonly="@(i.Id != _editId)" type="text" @bind="i.Password" class="form-control" placeholder="Note" />
-                </div>
-                <div class="input-group-append">
-                    <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i))">Edit</button>
-                </div>
-                <div class="input-group-append">
-                    <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
-                </div>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
-                </div>
-            </div>
-        </li>
+            </li>
+            orderItem++;
+        }
     }
 </ol>
 
+
 @*<button hidden="true" @onclick="@(e => Save(_data[0]))" class="btn btn-outline-danger">Remove selected</button>
-<button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
-<button @onclick="Save" class="btn btn-outline-primary">Save</button>*@
+    <button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
+    <button @onclick="Save" class="btn btn-outline-primary">Save</button>*@

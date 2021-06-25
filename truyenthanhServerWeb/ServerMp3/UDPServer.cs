@@ -17,6 +17,7 @@ namespace truyenthanhServerWeb.ServerMp3
         private static string _dataFile = @"UDPserver\dsetting.xml";
 
         public static List<User> _userList = new List<User>();
+        public static HashSet<Devicemini> _deviceHashet = new HashSet<Devicemini>();
 
         private static void updateFromDB()
         {
@@ -45,9 +46,23 @@ namespace truyenthanhServerWeb.ServerMp3
             List<Account>  accountList = new List<Account>(_accountDB.Find(account => true).ToList());
 
             //initialize list user
+            int tmpIndx = 0;
             foreach(Account ac in accountList)
             {
-                _userList.Add(new User(ac));
+                _userList.Add(new User() { account = ac, indx = tmpIndx });
+                tmpIndx++;
+            }
+
+            //initialize list device
+            IMongoCollection<Device> _deviceDB = database.GetCollection<Device>(_settingDB.DeviceCollectionName);
+            List<Device> deviceList = new List<Device>(_deviceDB.Find(dv => true).ToList());
+            foreach(Device dv in deviceList)
+            {
+                //find ownerId of device
+                _userList[dv.OwnerIndx].lDevice.Add(dv);
+
+                //add to Hashet
+                _deviceHashet.Add(new Devicemini(dv.Id, dv.OwnerIndx));
             }
         }
         public UDPServer()
@@ -74,8 +89,13 @@ namespace truyenthanhServerWeb.ServerMp3
         public void Run()
         {
             Thread.Sleep(30000);
-            Thread.Sleep(10000);
-            Thread.Sleep(10000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
+            Thread.Sleep(30000);
         }
 
         //public void UpdateAccountList(object sender, AccountChangedEventArgs args)

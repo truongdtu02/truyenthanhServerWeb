@@ -12,7 +12,7 @@ namespace truyenthanhServerWeb.Services
 
         public static event System.EventHandler<AccountChangedEventArgs> AccountChanged;
 
-        public void InvokeAcoountChangedEvent()
+        public void InvokeAccountChangedEvent()
         {
             var newData = Get();
             AccountChanged?.Invoke(this, new AccountChangedEventArgs(newData));
@@ -50,9 +50,9 @@ namespace truyenthanhServerWeb.Services
 
                 //add to list user of UDPserver
                 var tmpacc = _account.Find<Account>(ac => ac.Username == account.Username).FirstOrDefault();
-                if(tmpacc != null) UDPServer._userList.Add(new User(tmpacc));
+                if (tmpacc != null) UDPServer._userList.Add(new User() { account = tmpacc });
             }
-            InvokeAcoountChangedEvent();
+            InvokeAccountChangedEvent();
         }
 
         public void Update(string id, Account accountIn)
@@ -61,7 +61,8 @@ namespace truyenthanhServerWeb.Services
             if (tmpacc != null)
             {
                 //check duplicate if username is changed
-                if ((accountIn.Username == tmpacc.Username) || (!CheckDuplicateUsername(accountIn.Username)))
+                if ((accountIn.Username == tmpacc.Username) || (!CheckDuplicateUsername(accountIn.Username))
+                    || (accountIn.Username == "" && accountIn.Password == ""))
                 {
                     accountIn.Id = tmpacc.Id; //Id of MongoDb auto create and manage, can't change
                     _account.ReplaceOne(account => account.Id == id, accountIn);
@@ -73,7 +74,7 @@ namespace truyenthanhServerWeb.Services
                         UDPServer._userList[index].account = accountIn;
                 }
             }
-            InvokeAcoountChangedEvent();
+            InvokeAccountChangedEvent();
         }
 
         public void Remove(Account accountIn)
@@ -87,11 +88,11 @@ namespace truyenthanhServerWeb.Services
                 int index = UDPServer._userList.FindLastIndex(u => u.account.Id == accountIn.Id);
                 if (index >= 0)
                 {
-                    UDPServer._userList[index].killUser();
+                    //UDPServer._userList[index].killUser();
                     UDPServer._userList.RemoveAt(index);
                 }
             }
-            InvokeAcoountChangedEvent();
+            InvokeAccountChangedEvent();
         }
 
         public void Remove(string id)
@@ -105,18 +106,18 @@ namespace truyenthanhServerWeb.Services
                 int index = UDPServer._userList.FindLastIndex(u => u.account.Id == id);
                 if (index >= 0)
                 {
-                    UDPServer._userList[index].killUser();
+                    //UDPServer._userList[index].killUser();
                     UDPServer._userList.RemoveAt(index);
                 }
             }
-            InvokeAcoountChangedEvent();
+            InvokeAccountChangedEvent();
         }
     }
 
     public class AccountChangedEventArgs : System.EventArgs
     {
         public List<Account> NewValue { get; }
-        public List<Account> OldValue { get; }
+        //public List<Account> OldValue { get; }
 
         public AccountChangedEventArgs(List<Account> newValue)
         {

@@ -8,8 +8,9 @@ namespace truyenthanhServerWeb.Models
     public class User
     {
         public Account account { get; set; }
+        public int indx; //index in _userList
 
-        public List<Device> lDevice;
+        public List<Device> lDevice = new List<Device>();
 
         //just three element
         public List<byte[]> lADUBuffer = new List<byte[]>() { new byte[1], new byte[1], new byte[1]};
@@ -22,25 +23,15 @@ namespace truyenthanhServerWeb.Models
         string pathSong = @"Data"; //combine with username in constructor
         List<string> lSong = new List<string>();
 
-        public List<byte[]> lBuffer = new List<byte[]>();
-        public byte[] bbuuff;
+        //public User(Account _account)
+        //{
+        //    account = _account;
+        //}
 
-        public User(Account _account)
-        {
-            account = _account;
-
-            for(int j = 0; j < 300000; j++)
-            {
-                byte[] tmpbuff = new byte[1000];
-                for (int i = 0; i < tmpbuff.Length; i++) tmpbuff[i] = (byte)i;
-                lBuffer.Add(tmpbuff);
-            }
-        }
-
-        public void killUser()
-        {
-            bbuuff = null;
-            lBuffer.Clear();
-        }
+        //public void killUser()
+        //{
+        //    bbuuff = null;
+        //    lBuffer.Clear();
+        //}   
     }
 }
