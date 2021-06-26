@@ -1,0 +1,134 @@
+﻿@using truyenthanhServerWeb.Services
+@using truyenthanhServerWeb.Models
+@using System.Threading;
+@using System.ComponentModel.DataAnnotations;
+
+@inject AccountService _accountService
+
+@code{
+
+    //interval auto reload component in ms
+    const int IntervalReload = 5000;
+    private int userIndx;
+    private int userIndxInput;
+
+    [Parameter]
+    public string userName { get; set; }
+
+    private User _user;
+    private List<Device> _deviceList;
+    //[Required, MinLength(4), MaxLength(20)]
+    private string _inputName;
+    private string _inputId;
+    private string _editId = null;
+
+    private bool bDuplicateId = false; //show error duplicate username
+    private bool bOnInitialized = false;
+
+    protected override void OnInitialized()
+    {
+        _user = _accountService.GetUserByUsername(userName);
+        if (_user != null)
+            _deviceList = _user.lDevice;
+        //userIndx = _user.indx;
+        _editId = null;
+
+        // Subscription to database record change events
+        //DeviceService.DeviceChanged += UpdateNewDevices;
+
+        Console.WriteLine("User page");
+    }
+
+    // The event handler, will update the HTML view according to new stock value
+    private async void UpdateNewDevices(object sender, DeviceChangedEventArgs args)
+    {
+        //_deviceList = _deviceSerive.GetByIndx(userIndx);
+        //Console.WriteLine("new update");
+        await InvokeAsync(() =>
+        {
+            base.StateHasChanged();
+        });
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var timer = new Timer(new TimerCallback(_ =>
+            {
+                _user = _accountService.GetUserByUsername(userName);
+                if (_user != null)
+                    _deviceList = _user.lDevice;
+                InvokeAsync(() =>
+                {
+                    base.StateHasChanged();
+                });
+            }), null, IntervalReload, IntervalReload);
+
+            Console.WriteLine("User page 1st after render");
+        }
+    }
+}
+
+<style>
+    .dotOn {
+        height: 25px;
+        width: 25px;
+        background-color: greenyellow;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dotOff {
+        height: 25px;
+        width: 25px;
+        background-color: gray;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    pO {
+        color: greenyellow
+    }
+
+    pF {
+        color: gray
+    }
+</style>
+
+<table class="table table-hover table-sm">
+    <thead>
+        <tr>
+            <th>
+                <pO>Bật</pO> / <pF>Tắt</pF>
+            </th>
+            <th>
+                Tên thiết bị
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_deviceList != null)
+        {
+            foreach (var i in _deviceList)
+            {
+                <tr>
+                    <td><span class="@(i.deviceEndpoint.On ? "dotOn" : "dotOff")"></span></td>
+                    <td>@i.Name</td>
+                    <td><span class="@(i.deviceEndpoint.TimeOut ? "dotOff" : "dotOn")"></span></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@*<button hidden="true" @onclick="@(e => Save(_data[0]))" class="btn btn-outline-danger">Remove selected</button>
+    <button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
+    <button @onclick="Save" class="btn btn-outline-primary">Save</button>*@
+
+@*<span style="height: 25px; width: 25px; background-color: greenyellow;
+    border-radius: 50%; display: inline-block;"></span>*@

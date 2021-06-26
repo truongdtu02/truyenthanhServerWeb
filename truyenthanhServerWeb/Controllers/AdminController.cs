@@ -11,7 +11,7 @@ using truyenthanhServerWeb.Services;
 
 namespace truyenthanhServerWeb.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         //private readonly User _user;

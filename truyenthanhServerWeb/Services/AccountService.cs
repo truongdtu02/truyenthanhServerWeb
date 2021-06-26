@@ -40,6 +40,16 @@ namespace truyenthanhServerWeb.Services
             try { return _account.Find<Account>(account => account.Id == id).FirstOrDefault(); }
             catch { return null; }
         }
+        public Account GetByUser(string username)
+        {
+            try { return _account.Find<Account>(account => account.Username == username).FirstOrDefault(); }
+            catch { return null; }
+        }
+
+        public User GetUserByUsername(string username)
+        {
+            return UDPServer._userList.FirstOrDefault(x => x.account.Username == username);
+        }
 
         public void Create(Account account)
         {

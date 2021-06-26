@@ -11,6 +11,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using truyenthanhServerWeb.Models;
+using truyenthanhServerWeb.ServerMp3;
 
 namespace UDP_send_packet_frame
 {
@@ -57,6 +59,7 @@ namespace UDP_send_packet_frame
 
     class UDPsocket
     {
+        private const int intervalCheckReuestUDP = 5; // ~ 60s
         static bool left_frame_not_packet = false;
         static int sizeOfPacket;
 
@@ -141,17 +144,14 @@ namespace UDP_send_packet_frame
 
         public void UDPsocketListen()
         {
-            Stopwatch watch_client = new Stopwatch();
-            watch_client.Start();
-
             threadListen = new Thread(() =>
             {
-                threadListenFunc(watch_client);
+                threadListenFunc();
             });
 
             threadCheckRequest = new Thread(() =>
             {
-                threadCheckRequestFunc(watch_client);
+                threadCheckRequestFunc();
             });
 
             threadCheckRequest.Priority = ThreadPriority.Lowest;
@@ -171,52 +171,9 @@ namespace UDP_send_packet_frame
             threadSend.Start();
         }
 
-        public bool controlThreadSend(int _control)
+        private void analyzeRequest(int length)
         {
-            //_control: 1      2       3      4         5
-            //          pause, resume, next, previous, stop
-            if ((_control == 1) && (status == status_enum.PLAY))
-            {
-                status = status_enum.PAUSE;
-                //stopWatchSend.Stop();
-                //threadSend.Suspend();
-                //threadSend.Sleep(Timeout.Infinite);
-            }
-            else if ((_control == 2) && (status == status_enum.PAUSE))
-            {
-                status = status_enum.PLAY;
-                resumeNextPrevious = 2;
-                //stopWatchSend.Start();
-                //threadSend.Resume();
-            }
-            else if (status != status_enum.STOP)
-            {
-                if (_control == 3) //next
-                {
-                    resumeNextPrevious = 3;
-                    status = status_enum.PLAY;
-                }
-                else if (_control == 4)
-                {
-                    resumeNextPrevious = 4;
-                    status = status_enum.PLAY;
-                }
-                else if (_control == 5)
-                {
-                    status = status_enum.STOP;
-                    //threadSend.Abort();
-                }
-            }
-            else
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private void analyzeRequest(int length, Stopwatch _watchClient)
-        {
-            if (length >= 8)
+            if (length >= 24)
             {
                 //test request
                 /*IPEndPoint receive = (IPEndPoint)receive_IPEndPoint;
@@ -226,53 +183,53 @@ namespace UDP_send_packet_frame
 
 
                 //get id client
-                var ID_client_received = Encoding.ASCII.GetString(receive_buffer, 0, 8);
+                var ID_client_received = Encoding.ASCII.GetString(receive_buffer, 0, 24);
 
-                //check client in List
-                for (int i = 0; i < ClientList.Count; i++)
+                //check client in Hashet
+                var dvDetected = UDPServer._deviceHashet.FirstOrDefault(dv => dv.Id == ID_client_received);
+                if(dvDetected != null)
                 {
-                    if (String.Equals(ID_client_received, ClientList[i].ID_client))
+                    if(dvDetected.OwnerIndx > -1 && dvDetected.OwnerIndx < UDPServer._userList.Count)
                     {
-                        ClientList[i].TimeStamp_ms = _watchClient.ElapsedMilliseconds; //update time request
-                        ClientList[i].TimeOut = false;
-                        ClientList[i].IPEndPoint_client = receive_IPEndPoint; //update IP, port UDP of client
+                        var dvIndxSearched = UDPServer._userList[dvDetected.OwnerIndx].lDevice.FindLastIndex(dv => dv.Id == dvDetected.Id);
+                        if(dvIndxSearched != -1)
+                        {
+                            //UDPServer._userList[dvDetected.OwnerIndx].lDevice[dvIndxSearched].deviceEndpoint.IPEndPoint_client = 0;
+                            //UDPServer._userList[dvDetected.OwnerIndx].lDevice[dvIndxSearched].deviceEndpoint.TimeStamp_ms = 
+                        }
                     }
                 }
             }
         }
-        bool first_first = true;
-        private void threadListenFunc(Stopwatch _watchClient)
+        private void threadListenFunc()
         {
             while (true)
             {
-                //client need to send ID, string 4 byte
-                int length = 0;
                 try
                 {
-                    length = (int)socket.Receive(ref receive_IPEndPoint, receive_buffer);
-                    //length = socket.ReceiveFrom(receive_buffer, ref receive_IPEndPoint);
-                    //var result = Encoding.ASCII.GetString(receive_buffer, 0, length);
-                    //Console.WriteLine("{0} {1}", receive_IPEndPoint, result);
-                    if (first_first)
+                    int length = (int)socket.Receive(ref receive_IPEndPoint, receive_buffer);
+                    if (length >= 24)
                     {
-                        var result = Encoding.ASCII.GetString(receive_buffer, 0, length);
-                        if(result.Contains("3"))
+                        //get id client
+                        var ID_client_received = Encoding.ASCII.GetString(receive_buffer, 0, 24);
+
+                        //reserved handle Data encrypted
+
+                        //check client in Hashet
+                        var dvDetected = UDPServer._deviceHashet.FirstOrDefault(dv => dv.Id == ID_client_received);
+                        if (dvDetected != null)
                         {
-                            first_first = false;
-                            listTestClientEndPoint.Add(receive_IPEndPoint);
+                            if (dvDetected.OwnerIndx > -1 && dvDetected.OwnerIndx < UDPServer._userList.Count)
+                            {
+                                var dvIndxSearched = UDPServer._userList[dvDetected.OwnerIndx].lDevice.FindLastIndex(dv => dv.Id == dvDetected.Id);
+                                if (dvIndxSearched != -1)
+                                {
+                                    UDPServer._userList[dvDetected.OwnerIndx].lDevice[dvIndxSearched].deviceEndpoint.IPEndPoint_client = receive_IPEndPoint;
+                                    UDPServer._userList[dvDetected.OwnerIndx].lDevice[dvIndxSearched].deviceEndpoint.TimeStamp = DateTime.Now;
+                                    UDPServer._userList[dvDetected.OwnerIndx].lDevice[dvIndxSearched].deviceEndpoint.TimeOut = false;
+                                }
+                            }
                         }
-                        //Console.WriteLine("{0} {1}", receive_IPEndPoint, result);
-                        //first_first = false;
-
-                        //IPAddress ipaddrtmp = IPAddress.Parse("8.8.8.8"); //14.162.122.48
-                        //Console.WriteLine("IP address fixed {0}", ipaddrtmp);
-                        //int ipporttmp = ((IPEndPoint)receive_IPEndPoint).Port;
-
-                        //for (int i = 0; i < 500; i++)
-                        //{
-                        //    EndPoint tmpEndPoint = new IPEndPoint(ipaddrtmp, ipporttmp + i);
-                        //    listTestClientEndPoint.Add(tmpEndPoint);
-                        //}
                     }
                 }
                 catch//(Exception ex)
@@ -281,23 +238,28 @@ namespace UDP_send_packet_frame
                     continue;
                 }
 
-                analyzeRequest(length, _watchClient);
+                //analyzeRequest(length);
             }
         }
 
-        private void threadCheckRequestFunc(Stopwatch _watchClient)
+        private void threadCheckRequestFunc()
         {
+            DateTime nowMark;
+            int offsetTime;
             while (true)
             {
-                for (int i = 0; i < ClientList.Count; i++)
+                nowMark = DateTime.Now;
+                foreach(User u in UDPServer._userList)
                 {
-                    double offsetTime = _watchClient.ElapsedMilliseconds - ClientList[i].TimeStamp_ms;
-                    if (offsetTime > 60000) // > 60s
+                    foreach(Device dv in u.lDevice)
                     {
-                        ClientList[i].TimeOut = true;
+                        offsetTime = (int)(nowMark - dv.deviceEndpoint.TimeStamp).TotalSeconds;
+                        if (offsetTime > intervalCheckReuestUDP) 
+                            dv.deviceEndpoint.TimeOut = true;
                     }
                 }
-                Thread.Sleep(60000); //check every 60s
+
+                Thread.Sleep(intervalCheckReuestUDP * 1000); //check every intervalCheckReuestUDP seconds
             }
         }
 

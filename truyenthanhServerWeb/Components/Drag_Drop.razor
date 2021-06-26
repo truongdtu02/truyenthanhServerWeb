@@ -1,0 +1,97 @@
+﻿
+<h1>DragDrop demo</h1>
+<ul ondragover="event.preventDefault();" style="margin:20px">
+    @foreach (var item in Games)
+    {
+        if (item != null)
+        {
+            <li draggable="true" style="list-style-type:none; height:30px" @key="item.ID" tabindex="1"
+                @ondrop="@(()=> Drop(item))" @ondrag="@(()=> StartDrag(item))">
+                <span>@item.Text</span> <small>@item.ID</small>
+            </li>
+        }
+        else
+        {
+            <li>NULL??</li>
+        }
+    }
+</ul>
+
+<button @onclick="ReportList">List</button>
+@code
+{
+
+    int currentIndex;
+
+    void StartDrag(Game item)
+    {
+        currentIndex = GetIndex(item);
+        Console.WriteLine($"DragStart for {item.ID} index {currentIndex}");
+    }
+
+    void ClickItem(Game item)
+    {
+        currentIndex = GetIndex(item);
+    }
+
+    int GetIndex(Game item)
+    {
+        return Games.FindIndex(a => a.ID == item.ID);
+    }
+
+    void Drop(Game item)
+    {
+        if (item != null)
+        {
+            Console.WriteLine($"Drop item {item.Text} ({item.ID})");
+            var index = GetIndex(item);
+            Console.WriteLine($"Drop index is {index}, move from {currentIndex}");
+            // get current item
+            var current = Games[currentIndex];
+            // remove game from current index
+            Games.RemoveAt(currentIndex);
+            Games.Insert(index, current);
+
+            // update current selection
+            currentIndex = index;
+
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Drop - null");
+        }
+    }
+
+    void ReportList()
+    {
+        int i = 0;
+        foreach (var item in Games)
+        {
+            Console.WriteLine($"{i++}: {item.ID} = {item.Text}");
+        }
+    }
+
+    public class Game
+    {
+        public string ID { get; set; }
+        public string Text { get; set; }
+        public override string ToString()
+        {
+            return Text;
+        }
+    }
+
+    List<Game> Games = new List<Game> {
+    new Game() { ID= "Game1", Text= "American Football"},
+    new Game() { ID= "Game2", Text= "Badminton"  },
+    new Game() { ID= "Game3", Text= "Basketball"  },
+    new Game() { ID= "Game4", Text= "Cricket"},
+    new Game() { ID= "Game5", Text= "Football" },
+    new Game() { ID= "Game6", Text= "Golf"  },
+    new Game() { ID= "Game7", Text= "Hockey"  },
+    new Game() { ID= "Game8", Text= "Rugby" },
+    new Game() { ID= "Game9", Text= "Snooker"  },
+    new Game() { ID= "Game10", Text= "Tennis" },
+    };
+}

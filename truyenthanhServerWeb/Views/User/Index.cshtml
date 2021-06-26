@@ -1,0 +1,12 @@
+﻿@model truyenthanhServerWeb.Models.Account
+@{
+    ViewData["Title"] = "User Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to user page</h1>
+</div>
+
+<component type="typeof(Counter)" render-mode="Server" />
+
+<component type="typeof(DeviceUser)" render-mode="Server"  param-userName ="@Model.Username"/>

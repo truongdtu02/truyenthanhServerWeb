@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace truyenthanhServerWeb.Models
@@ -11,6 +14,7 @@ namespace truyenthanhServerWeb.Models
         public int indx; //index in _userList
 
         public List<Device> lDevice = new List<Device>();
+        //public ObservableCollection<Device> lDevice = new ObservableCollection<Device>();
 
         //just three element
         public List<byte[]> lADUBuffer = new List<byte[]>() { new byte[1], new byte[1], new byte[1]};
@@ -22,11 +26,6 @@ namespace truyenthanhServerWeb.Models
         //list song in path song
         string pathSong = @"Data"; //combine with username in constructor
         List<string> lSong = new List<string>();
-
-        //public User(Account _account)
-        //{
-        //    account = _account;
-        //}
 
         //public void killUser()
         //{

@@ -50,6 +50,7 @@ namespace truyenthanhServerWeb.ServerMp3
             foreach(Account ac in accountList)
             {
                 _userList.Add(new User() { account = ac, indx = tmpIndx });
+                //_userList[tmpIndx].lDevice = new List<Device>();
                 tmpIndx++;
             }
 
@@ -81,21 +82,21 @@ namespace truyenthanhServerWeb.ServerMp3
             };
 
             //launch
-            //UDPsocket udpSocket = new UDPsocket();
-            //List<soundTrack> soundList = new List<soundTrack>();
-            //udpSocket.launchUDPsocket(soundList, clientList);
+            UDPsocket udpSocket = new UDPsocket();
+            List<soundTrack> soundList = new List<soundTrack>();
+            udpSocket.launchUDPsocket(soundList, clientList);
         }
 
         public void Run()
         {
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
-            Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
+            //Thread.Sleep(30000);
         }
 
         //public void UpdateAccountList(object sender, AccountChangedEventArgs args)

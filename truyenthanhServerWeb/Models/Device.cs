@@ -17,7 +17,7 @@ namespace truyenthanhServerWeb.Models
         public string Name { get; set; }
         public int OwnerIndx { get; set; } //index in _userList, don't allow edit in UI
         [BsonIgnore]
-        public DeviceEndpoint deviceEndpoint;
+        public DeviceEndpoint deviceEndpoint = new DeviceEndpoint();
 
         //public Device(string id, string name, int ownerIndx)
         //{
@@ -33,18 +33,15 @@ namespace truyenthanhServerWeb.Models
         EndPoint ipEndPoint_client = new IPEndPoint(IPAddress.Any, 0);
         public EndPoint IPEndPoint_client { get => ipEndPoint_client; set => ipEndPoint_client = value; }
 
-        double timeStamp_ms = 0;
+        DateTime timeStamp = DateTime.Now;
 
         bool timeOut = true; //timeOut = true, that mean don't receive request in last 5s, and don't send
 
-        bool on; //change this on app
-
-        int numSend = 1; //multi packet is sent to client to improve UDP loss
-        public int NumSend { get => numSend; set => numSend = value; }
+        bool on = true; //change this on app
 
         //server just sends to client when timeOut == false and On == true
 
-        public double TimeStamp_ms { get => timeStamp_ms; set => timeStamp_ms = value; }
+        public DateTime TimeStamp { get => timeStamp; set => timeStamp = value; }
         public bool TimeOut { get => timeOut; set => timeOut = value; }
         public bool On { get => on; set => on = value; }
     }

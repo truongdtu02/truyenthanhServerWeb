@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +39,23 @@ namespace truyenthanhServerWeb
             services.AddServerSideBlazor();
             services.AddControllersWithViews();
 
+            //login and authentication + authorization
+            services.AddHttpContextAccessor();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Home/Index"; // ~ action Login
+                options.LogoutPath = "/Home/Index";
+                options.AccessDeniedPath = "/Home/Index";
+            });
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             //DI for AccountService, DeviceService
             services.AddSingleton<AccountService>();
             services.AddSingleton<DeviceService>();
@@ -58,6 +77,7 @@ namespace truyenthanhServerWeb
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
