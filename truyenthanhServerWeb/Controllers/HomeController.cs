@@ -12,6 +12,10 @@ using truyenthanhServerWeb.Models;
 using truyenthanhServerWeb.ServerMp3;
 using truyenthanhServerWeb.Services;
 
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+
 namespace truyenthanhServerWeb.Controllers
 {
     public class HomeController : Controller
@@ -107,6 +111,33 @@ namespace truyenthanhServerWeb.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+
+        [HttpGet]
+        public ActionResult UploadFile()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file != null)
+                {
+                    var path = Path.Combine("Upload", file.FileName);
+                    using var stream = new FileStream(path, FileMode.Create);
+                    file.CopyTo(stream);
+                }
+                ViewBag.Message = "File Uploaded Successfully!!";
+                return View();
+            }
+            catch
+            {
+                ViewBag.Message = "File upload failed!!";
+                return View();
+            }
         }
     }
 }
