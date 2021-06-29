@@ -43,7 +43,8 @@ namespace truyenthanhServerWeb
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("http://0.0.0.0:5005", "https://0.0.0.0:5002");
+                    //webBuilder.UseUrls("http://0.0.0.0:5005", "https://0.0.0.0:5002");
+                    //webBuilder.UseUrls("http://0.0.0.0:5000");//, "https://0.0.0.0:5002");
                     webBuilder.UseStartup<Startup>();
                 });
     }
