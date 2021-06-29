@@ -120,7 +120,7 @@ namespace truyenthanhServerWeb.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult UploadFile(IFormFile file)
+        public async Task<ActionResult> UploadFile(IFormFile file)
         {
             try
             {
@@ -128,7 +128,8 @@ namespace truyenthanhServerWeb.Controllers
                 {
                     var path = Path.Combine("Upload", file.FileName);
                     using var stream = new FileStream(path, FileMode.Create);
-                    file.CopyTo(stream);
+                    await file.CopyToAsync(stream);
+                    //file.CopyTo(stream);
                 }
                 ViewBag.Message = "File Uploaded Successfully!!";
                 return View();
