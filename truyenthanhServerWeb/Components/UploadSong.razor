@@ -68,7 +68,7 @@
         using var stream = fileUpload.Song.OpenReadStream(maxFileSize);
         var path = $"{env.ContentRootPath}\\Upload\\{fileUpload.Song.Name}";
         using var file = File.OpenWrite(path);
-        var buffer = new byte[4 * 1096];
+        var buffer = new byte[1 * 1024 * 1024];
         int bytesRead = 0;
         double totalRead = 0;
         displayProgress = true;
