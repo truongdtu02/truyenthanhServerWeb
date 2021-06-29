@@ -79,7 +79,7 @@
             await file.WriteAsync(buffer, cancellation.Token);
 
             progressPercent = (int)((totalRead / fileUpload.Song.Size) * 100);
-            StateHasChanged();
+            //StateHasChanged();
         }
 
         displayProgress = false;
