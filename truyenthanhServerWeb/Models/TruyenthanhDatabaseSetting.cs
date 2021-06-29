@@ -11,6 +11,9 @@ namespace truyenthanhServerWeb.Models
         public string DeviceCollectionName { get; set; }
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
+        public string PathSong { get; set; }
+        public string PassAdmin { get; set; }
+
     }
 
     public interface ITruyenthanhDatabaseSettings
@@ -19,5 +22,7 @@ namespace truyenthanhServerWeb.Models
         string DeviceCollectionName { get; set; }
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
+        string PathSong { get; set; }
+        string PassAdmin { get; set; }
     }
 }

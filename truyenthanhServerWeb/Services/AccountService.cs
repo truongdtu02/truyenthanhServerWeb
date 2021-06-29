@@ -28,6 +28,8 @@ namespace truyenthanhServerWeb.Services
 
         public bool CheckDuplicateUsername(string newUsername)
         {
+            if (newUsername.ToLower() == "admin") return true;
+
             var tmpFind = _account.Find<Account>(account => account.Username == newUsername).FirstOrDefault();
             return tmpFind != null;
         }

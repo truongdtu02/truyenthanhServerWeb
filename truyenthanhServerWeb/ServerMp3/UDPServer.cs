@@ -14,7 +14,9 @@ namespace truyenthanhServerWeb.ServerMp3
 {
     public class UDPServer
     {
-        private static string _dataFile = @"UDPserver\dsetting.xml";
+        private static string pathSong;
+        private static string _dataFile = @"appsettings.xml";
+        private static string AdminPass;
 
         public static List<User> _userList = new List<User>();
         public static HashSet<Devicemini> _deviceHashet = new HashSet<Devicemini>();
@@ -30,15 +32,20 @@ namespace truyenthanhServerWeb.ServerMp3
                     AccountCollectionName = "Account",
                     DeviceCollectionName = "Device",
                     ConnectionString = "mongodb://localhost:27017",
-                    DatabaseName = "TruyenThanh"
+                    DatabaseName = "TruyenThanh",
+                    PathSong = "Song",
+                    PassAdmin = "admin@2020"
                 };
+                using var stream = File.Create(_dataFile);
+                _serializer.Serialize(stream, _settingDB);
             }
             else
             {
                 using var stream = File.OpenRead(_dataFile);
                 _settingDB = _serializer.Deserialize(stream) as TruyenthanhDatabaseSettings;
             }
-
+            AdminPass = _settingDB.PassAdmin;
+            pathSong = _settingDB.PathSong;
             var client = new MongoClient(_settingDB.ConnectionString);
             var database = client.GetDatabase(_settingDB.DatabaseName);
 
@@ -66,6 +73,18 @@ namespace truyenthanhServerWeb.ServerMp3
                 _deviceHashet.Add(new Devicemini(dv.Id, dv.OwnerIndx));
             }
         }
+
+        public static bool CheckPassAdmin(string _pass)
+        {
+            if (_pass == AdminPass) return true;
+            return false;
+        }
+
+        private static void UpdateSong(string rootPath)
+        {
+
+        }
+
         public UDPServer()
         {
             updateFromDB();

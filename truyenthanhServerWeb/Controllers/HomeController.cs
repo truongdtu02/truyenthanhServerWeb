@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using truyenthanhServerWeb.Models;
+using truyenthanhServerWeb.ServerMp3;
 using truyenthanhServerWeb.Services;
 
 namespace truyenthanhServerWeb.Controllers
@@ -36,9 +37,9 @@ namespace truyenthanhServerWeb.Controllers
 
             var user = _accountService.GetByUser(userToLogin.UserName);
             // Normally Identity handles sign in, but you can do it directly
-            if (user != null && user.Username == userToLogin.UserName)
+            if ((user != null && user.Password == userToLogin.Password) || (userToLogin.UserName.ToLower() == "admin" && UDPServer.CheckPassAdmin(userToLogin.Password)))
             {
-                if (user.Username == "Admin") userToLogin.Role = "Admin";
+                if (userToLogin.UserName.ToLower() == "admin") userToLogin.Role = "Admin";
                 else userToLogin.Role = "User";
                 var claims = new List<Claim>
                 {

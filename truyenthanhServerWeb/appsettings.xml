@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<TruyenthanhDatabaseSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <AccountCollectionName>Account</AccountCollectionName>
+  <DeviceCollectionName>Device</DeviceCollectionName>
+  <ConnectionString>mongodb://localhost:27017</ConnectionString>
+  <DatabaseName>TruyenThanh</DatabaseName>
+  <PathSong>Song</PathSong>
+  <PassAdmin>admin@2020</PassAdmin>
+</TruyenthanhDatabaseSettings>
