@@ -141,6 +141,7 @@ namespace truyenthanhServerWeb.Models
                     }
                 }
             });
+            listenUDPThread.Priority = ThreadPriority.AboveNormal;
             listenUDPThread.Start();
         }
 
