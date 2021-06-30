@@ -29,6 +29,7 @@ namespace truyenthanhServerWeb.ServerMp3
 
             //string outPath = Path.Combine("Song", "out.mp3");
             string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
+            Console.WriteLine(udpParam);
 
             //Change some parameters of video stream
             audioStream
