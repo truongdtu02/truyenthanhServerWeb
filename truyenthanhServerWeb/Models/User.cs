@@ -102,12 +102,13 @@ namespace truyenthanhServerWeb.Models
             }
         }
 
-        public User(IPAddress address, int port, int _indx) : base(address, port)
+        public User(IPAddress address, int port, int _indx, Account _ac) : base(address, port)
         {
             ffmpegPort = port;
             Start();
             ControlChanged += SongControlHandler;
             indx = _indx;
+            account = _ac;
             pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
             //Console.WriteLine("user {0} path: {1}", indx, pathSong);
         }

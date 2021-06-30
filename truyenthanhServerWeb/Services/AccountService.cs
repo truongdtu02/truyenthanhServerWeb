@@ -64,7 +64,7 @@ namespace truyenthanhServerWeb.Services
                 //add to list user of UDPserver
                 var tmpacc = _account.Find<Account>(ac => ac.Username == account.Username).FirstOrDefault();
                 int lCountTmp = UDPServer._userList.Count();
-                if (tmpacc != null) UDPServer._userList.Add(new User(IPAddress.Loopback, UDPServer.PortFFmpeg + lCountTmp, lCountTmp) { account = tmpacc });
+                if (tmpacc != null) UDPServer._userList.Add(new User(IPAddress.Loopback, UDPServer.PortFFmpeg + lCountTmp, lCountTmp, tmpacc));
             }
             InvokeAccountChangedEvent();
         }

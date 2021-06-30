@@ -19,7 +19,7 @@ namespace truyenthanhServerWeb.ServerMp3
     public class UDPServer
     {
         private int portUDPBroadcast;
-        private int portFFmpeg;//portUserFFmpegStartFrom
+        private static int portFFmpeg;//portUserFFmpegStartFrom
         private static string pathSong;
         public static string PathSong { get => pathSong; }
         private static string _dataFile = @"appsettings.xml";
@@ -34,7 +34,7 @@ namespace truyenthanhServerWeb.ServerMp3
         internal bool bIsInitalizeDone { get => _bIsInitalizeDone; }
         private int intervalCheckRequestUDP;
 
-        public static int PortFFmpeg { get => PortFFmpeg; }
+        public static int PortFFmpeg { get => portFFmpeg; }
 
         private void updateFromDB()
         {           
@@ -83,7 +83,7 @@ namespace truyenthanhServerWeb.ServerMp3
             int tmpIndx = 0;
             foreach(Account ac in accountList)
             {
-                _userList.Add(new User(IPAddress.Loopback, portFFmpeg + tmpIndx, tmpIndx) { account = ac });
+                _userList.Add(new User(IPAddress.Loopback, portFFmpeg + tmpIndx, tmpIndx, ac));
 
                 //initialize list song
                 UpdateSong(tmpIndx);
