@@ -132,6 +132,7 @@ namespace truyenthanhServerWeb.Models
                     {
                         // khi nhận được gói tin nào sẽ lưu lại địa chỉ của tiến trình client
                         var length = socket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
+                        Console.WriteLine("r {0}", length);
                         OnReceived(length);
                     }
                     catch (Exception ex)
