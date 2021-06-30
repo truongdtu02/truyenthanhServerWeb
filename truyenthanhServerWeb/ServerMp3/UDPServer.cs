@@ -155,7 +155,7 @@ namespace truyenthanhServerWeb.ServerMp3
         public void Run()
         {
             //update ffmpeg bin
-            DownLoadFFmpeg();
+            //DownLoadFFmpeg();
             updateFromDB();
 
             _bIsInitalizeDone = true;
