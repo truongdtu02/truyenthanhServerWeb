@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -25,6 +26,8 @@ namespace truyenthanhServerWeb.ServerMp3
             //var videoStream = mediaInfo.VideoStreams.First();
             var audioStream = mediaInfo.AudioStreams.First();
 
+            string outPath = Path.Combine("Song", "out.mp3");
+
             //Change some parameters of video stream
             audioStream
                 .SetBitrate(48000)
@@ -37,15 +40,15 @@ namespace truyenthanhServerWeb.ServerMp3
                 //Add audio stream to output file
                 .AddStream(audioStream)
                 //Set output file path
-                //.SetOutput(outPath)
+                .SetOutput(outPath)
                 //SetOverwriteOutput to overwrite files. It's useful when we already run application before
                 //.SetOverwriteOutput(true)
                 //Disable multithreading
-                .UseMultiThread(true)
+                //.UseMultiThread(true)
                 //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
-                .SetPreset(ConversionPreset.UltraFast)
+                //.SetPreset(ConversionPreset.UltraFast)
                 //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
-                .AddParameter($"-f mp3 udp://{IPAddress.Loopback}:" + port.ToString());
+                //.AddParameter($"-f mp3 udp://{IPAddress.Loopback}:" + port.ToString());
             //Add log to OnProgress
             conversion.OnProgress += async (sender, args) =>
             {
