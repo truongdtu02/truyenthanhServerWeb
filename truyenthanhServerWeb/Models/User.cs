@@ -142,6 +142,8 @@ namespace truyenthanhServerWeb.Models
                 }
             }
 
+            if (size != 144) Console.WriteLine("error size {0}", size);
+
             // Echo the message back to the sender
             //SendAsync(endpoint, buffer, 0, size);
             ReceiveAsync();
