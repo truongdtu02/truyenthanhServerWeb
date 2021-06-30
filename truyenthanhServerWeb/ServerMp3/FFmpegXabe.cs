@@ -45,11 +45,11 @@ namespace truyenthanhServerWeb.ServerMp3
                 .SetPreset(ConversionPreset.UltraFast)
             .AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
             //Add log to OnProgress
-            //conversion.OnProgress += async (sender, args) =>
-            //{
-            //    //Show all output from FFmpeg to console
-            //    await Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
-            //};
+            conversion.OnProgress += async (sender, args) =>
+            {
+                //Show all output from FFmpeg to console
+                await Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
+            };
 
             //conversion.OnProgress += (duration, length) => { currentProgress = duration; }
 
