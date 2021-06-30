@@ -22,21 +22,18 @@ namespace truyenthanhServerWeb.ServerMp3
 
             _bIsConversionRunning = true;
 
-            var mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
+            IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
 
             //var videoStream = mediaInfo.VideoStreams.First();
-            var audioStream = mediaInfo.AudioStreams.First();
+            IStream audioStream = mediaInfo.AudioStreams.FirstOrDefault()?
+                .SetBitrate(48000)
+                .SetChannels(1)
+                .SetSampleRate(24000);
 
             //string outPath = Path.Combine("Song", "out.mp3");
             string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
             Console.WriteLine(udpParam);
 
-            //Change some parameters of video stream
-            audioStream
-                .SetBitrate(48000)
-                .SetChannels(1)
-                .SetSampleRate(24000)
-                ;
             //Create new conversion object
             var conversion = FFmpeg.Conversions.New()
                 .AddParameter("-re", ParameterPosition.PreInput)
@@ -51,7 +48,7 @@ namespace truyenthanhServerWeb.ServerMp3
             //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
             //.SetPreset(ConversionPreset.UltraFast)
             //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
-            .AddParameter(udpParam, ParameterPosition.PostInput);
+            .AddParameter(udpParam);
 
             //Add log to OnProgress
             //conversion.OnProgress += async (sender, args) =>
