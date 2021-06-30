@@ -3,7 +3,7 @@
 @code{
 
     //interval auto reload component in ms
-    const int IntervalReload = 1000; // ~ 30s
+    const int IntervalReload = 5000; // ~ 30s
     private int userIndx;
     private int userIndxInput;
 
@@ -58,7 +58,7 @@
                 {
                     base.StateHasChanged();
                 });
-                //Console.Write(".");
+                Console.Write(".");
             }), null, IntervalReload, IntervalReload);
 
             Console.WriteLine("User page 1st after render");

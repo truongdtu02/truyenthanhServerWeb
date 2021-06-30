@@ -53,10 +53,10 @@ namespace truyenthanhServerWeb.ServerMp3
 
             //conversion.OnProgress += (duration, length) => { currentProgress = duration; }
 
-            //conversion.OnDataReceived += (sender, args) =>
-            //{
-            //    Console.WriteLine($"{args.Data}{sender.ToString()}");
-            //};
+            conversion.OnDataReceived += (sender, args) =>
+            {
+                Console.WriteLine($"{args.Data}{sender.ToString()}");
+            };
             //Start conversion
             await conversion.Start(cancellationTokenSource.Token);
 
