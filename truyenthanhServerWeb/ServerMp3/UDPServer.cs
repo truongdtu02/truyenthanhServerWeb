@@ -36,6 +36,8 @@ namespace truyenthanhServerWeb.ServerMp3
 
         public static int PortFFmpeg { get => portFFmpeg; }
 
+        private static UDPsocket udpSocket;
+
         private void updateFromDB()
         {           
             TruyenthanhDatabaseSettings _settingDB;
@@ -159,7 +161,11 @@ namespace truyenthanhServerWeb.ServerMp3
             _bIsInitalizeDone = true;
 
             //launch UDP server
-            UDPsocket udpSocket = new UDPsocket(IPAddress.Any, portUDPBroadcast, intervalCheckRequestUDP);
+            udpSocket = new UDPsocket(IPAddress.Any, portUDPBroadcast, intervalCheckRequestUDP);
+        }
+        public static void SendAsync(EndPoint ep, byte[] buff)
+        {
+            udpSocket.SendAsync(ep, buff);
         }
 
     }

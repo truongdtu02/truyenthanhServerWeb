@@ -28,9 +28,7 @@ namespace truyenthanhServerWeb.ServerMp3
             var audioStream = mediaInfo.AudioStreams.First();
 
             //string outPath = Path.Combine("Song", "out.mp3");
-            string udpParam = $"-f mp3 udp://127.0.0.1:{port}";
-
-            Console.WriteLine(udpParam);
+            string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
 
             //Change some parameters of video stream
             audioStream
@@ -53,7 +51,6 @@ namespace truyenthanhServerWeb.ServerMp3
             //.SetPreset(ConversionPreset.UltraFast)
             //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
             .AddParameter(udpParam);
-            //.AddParameter("-f mp3 udp://127.0.0.1:11000");
 
             //Add log to OnProgress
             conversion.OnProgress += async (sender, args) =>

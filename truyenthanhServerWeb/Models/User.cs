@@ -135,7 +135,7 @@ namespace truyenthanhServerWeb.Models
                     {
                         if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
-                            SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendADU);
+                            UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendADU);
                         }
                     }
                     frameId++;
