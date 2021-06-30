@@ -31,24 +31,25 @@ namespace truyenthanhServerWeb.ServerMp3
                 .SetSampleRate(24000);
 
             //string outPath = Path.Combine("Song", "out.mp3");
-            string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
-            Console.WriteLine(udpParam);
+            //string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
+            string outPath = "udp://127.0.0.1:" + port.ToString();
 
             //Create new conversion object
             var conversion = FFmpeg.Conversions.New()
                 .AddParameter("-re", ParameterPosition.PreInput)
                 //Add audio stream to output file
                 .AddStream(audioStream)
+                .SetOutputFormat(Format.mp3)
                 //Set output file path
-                //.SetOutput(outPath)
+                .SetOutput(outPath);
                 //SetOverwriteOutput to overwrite files. It's useful when we already run application before
                 //.SetOverwriteOutput(true)
                 //Disable multithreading
                 //.UseMultiThread(true)
-            //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
-            //.SetPreset(ConversionPreset.UltraFast)
-            //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
-            .AddParameter(udpParam);
+                //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
+                //.SetPreset(ConversionPreset.UltraFast)
+                //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
+                //.AddParameter(udpParam);
 
             //Add log to OnProgress
             //conversion.OnProgress += async (sender, args) =>
