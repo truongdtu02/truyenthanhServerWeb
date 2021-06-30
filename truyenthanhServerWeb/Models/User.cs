@@ -15,7 +15,7 @@ using truyenthanhServerWeb.ServerMp3;
 
 namespace truyenthanhServerWeb.Models
 {
-    public class User : NetCoreServer.UdpClient
+    public class User
     {
         public Account account { get; set; }
         public int indx; //index in _userList
@@ -44,7 +44,7 @@ namespace truyenthanhServerWeb.Models
         private int ffmpegPort;
         public int FFmpegPort { get => ffmpegPort; }
 
-        Thread ffmpegThread;
+        Thread ffmpegThread, listenUDPThread;
 
         private uint songId = 1;
         private uint frameId = 1;
@@ -95,6 +95,7 @@ namespace truyenthanhServerWeb.Models
                     try
                     {
                         await ffmpegXabe.convertMP3(songPath, ffmpegPort);
+                        playState = ePlayState.idle;
                     }
                     catch { }
                 });
@@ -102,33 +103,52 @@ namespace truyenthanhServerWeb.Models
             }
         }
 
-        public User(IPAddress address, int port, int _indx, Account _ac) : base(address, port)
+        //socket udp listen data from ffmpeg
+        // InterNetwork là họ địa chỉ dành cho IPv4
+        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+        // biến này về sau sẽ chứa địa chỉ của tiến trình client nào gửi gói tin tới
+        EndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
+
+        byte[] receiveBuffer = new byte[144]; //1 frame 48kbps
+
+        public User(int _indx, Account _ac)
         {
-            ffmpegPort = port;
-            ControlChanged += SongControlHandler;
+            ffmpegPort = UDPServer.PortFFmpeg + _indx;
             indx = _indx;
             account = _ac;
+
+            ControlChanged += SongControlHandler;
             pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
-            //Console.WriteLine("user {0} path: {1}", indx, pathSong);
-            Connect();
+
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, ffmpegPort));
+
+            //initiallize listen UDP thread
+            listenUDPThread = new Thread(() =>
+            {
+                while(true)
+                {
+                    try
+                    {
+                        // khi nhận được gói tin nào sẽ lưu lại địa chỉ của tiến trình client
+                        var length = socket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
+                        OnReceived(length);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("UDP user {0} error {1}", indx, ex);
+                    }
+                }
+            });
+            listenUDPThread.Start();
         }
 
-        protected override void OnConnected()
+        private void OnReceived(int length)
         {
-            // Start receive datagrams
-            Console.WriteLine("UDP client {0} connected", indx);
-            ReceiveAsync();
-        }
-
-        protected override void OnReceived(EndPoint endpoint, byte[] buffer, long offset, long size)
-        {
-            //Console.WriteLine("Incoming: " + Encoding.UTF8.GetString(buffer, (int)offset, (int)size));
-            //Console.WriteLine("Incoming: {0} {1}", (int)offset, (int)size);
-
-            if(playState == ePlayState.running && size == 144) // ~ >= 144 min 48kbps
+            if(playState == ePlayState.running && length == 144) // ~ >= 144 min 48kbps
             {
                 //packet frame
-                int packetLength = packet_udp_frameADU(buffer, (int)size);
+                int packetLength = packet_udp_frameADU(receiveBuffer, length);
                 //sendAsync
                 if(packetLength > 0)
                 {
@@ -145,16 +165,7 @@ namespace truyenthanhServerWeb.Models
                 }
             }
 
-            if (size != 144) Console.WriteLine("error size {0}", size);
-            if(offset != 0) Console.WriteLine("error offset {0}", offset);
-            // Echo the message back to the sender
-            //SendAsync(endpoint, buffer, 0, size);
-            ReceiveAsync();
-        }
-
-        protected override void OnError(SocketError error)
-        {
-            Console.WriteLine($"UDP FFmpeg {indx} : {error}");
+            if (length != 144) Console.WriteLine("error size {0}", length);
         }
 
         byte[] sendBuff = new byte[1000];

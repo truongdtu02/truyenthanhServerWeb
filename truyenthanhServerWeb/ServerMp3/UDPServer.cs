@@ -85,7 +85,7 @@ namespace truyenthanhServerWeb.ServerMp3
             int tmpIndx = 0;
             foreach(Account ac in accountList)
             {
-                _userList.Add(new User(IPAddress.Loopback, portFFmpeg + tmpIndx, tmpIndx, ac));
+                _userList.Add(new User(tmpIndx, ac));
 
                 //initialize list song
                 UpdateSong(tmpIndx);
