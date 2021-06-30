@@ -51,7 +51,7 @@ namespace truyenthanhServerWeb.ServerMp3
                     PathSong = "Song",
                     PassAdmin = "admin@2020",
                     PortUDPBroadcast = 2000,
-                    PortFFmpeg = 10000,
+                    PortFFmpeg = 11000,
                     IntervalCheckRequestUDP = 5 // ~ 60s
                 };
                 using var stream = File.Create(_dataFile);
