@@ -1,14 +1,9 @@
-﻿@using truyenthanhServerWeb.Services
-@using truyenthanhServerWeb.Models
-@using System.Threading;
-@using System.ComponentModel.DataAnnotations;
-
-@inject AccountService _accountService
+﻿@inject AccountService _accountService
 
 @code{
 
     //interval auto reload component in ms
-    const int IntervalReload = 5000;
+    const int IntervalReload = 1000; // ~ 30s
     private int userIndx;
     private int userIndxInput;
 
@@ -54,15 +49,16 @@
     {
         if (firstRender)
         {
-            var timer = new Timer(new TimerCallback(_ =>
+            var timer = new Timer(new TimerCallback( async _ =>
             {
                 _user = _accountService.GetUserByUsername(userName);
                 if (_user != null)
                     _deviceList = _user.lDevice;
-                InvokeAsync(() =>
+                await InvokeAsync(() =>
                 {
                     base.StateHasChanged();
                 });
+                //Console.Write(".");
             }), null, IntervalReload, IntervalReload);
 
             Console.WriteLine("User page 1st after render");
@@ -74,7 +70,7 @@
     .dotOn {
         height: 25px;
         width: 25px;
-        background-color: greenyellow;
+        background-color: green;
         border-radius: 50%;
         display: inline-block;
     }
@@ -88,13 +84,15 @@
     }
 
     pO {
-        color: greenyellow
+        color: green
     }
 
     pF {
         color: gray
     }
 </style>
+
+<h4>Danh sách thiết bị</h4>
 
 <table class="table table-hover table-sm">
     <thead>
@@ -130,5 +128,5 @@
     <button @onclick="ClearAll" class="btn btn-outline-danger">Remove all</button>
     <button @onclick="Save" class="btn btn-outline-primary">Save</button>*@
 
-@*<span style="height: 25px; width: 25px; background-color: greenyellow;
+@*<span style="height: 25px; width: 25px; background-color: green;
     border-radius: 50%; display: inline-block;"></span>*@

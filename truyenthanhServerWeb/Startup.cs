@@ -59,6 +59,7 @@ namespace truyenthanhServerWeb
             //DI for AccountService, DeviceService
             services.AddSingleton<AccountService>();
             services.AddSingleton<DeviceService>();
+            services.AddSingleton<SongService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -13,6 +13,9 @@ namespace truyenthanhServerWeb.Models
         public string DatabaseName { get; set; }
         public string PathSong { get; set; }
         public string PassAdmin { get; set; }
+        public int PortUDPBroadcast { get; set; }
+        public int PortFFmpeg { get; set; }
+        public int IntervalCheckRequestUDP { get; set; }
 
     }
 
@@ -24,5 +27,8 @@ namespace truyenthanhServerWeb.Models
         string DatabaseName { get; set; }
         string PathSong { get; set; }
         string PassAdmin { get; set; }
+        int PortUDPBroadcast { get; set; }
+        int PortFFmpeg { get; set; }
+        int IntervalCheckRequestUDP { get; set; }
     }
 }

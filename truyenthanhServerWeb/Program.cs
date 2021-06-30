@@ -25,14 +25,16 @@ namespace truyenthanhServerWeb
     {
         public static void Main(string[] args)
         {
+            var udpMp3Server = new UDPServer();
+
             Thread hostweb = new Thread(() =>
             {
-                Thread.Sleep(5000);
+                //wait ultil UDPServer is done initialize
+                while (!udpMp3Server.bIsInitalizeDone) ;
                 CreateHostBuilder(args).Build().Run();
             });
             hostweb.Start();
 
-            var udpMp3Server = new UDPServer();
             udpMp3Server.Run();
 
             //CreateHostBuilder(args).Build().Run();

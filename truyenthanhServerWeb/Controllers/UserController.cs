@@ -11,7 +11,6 @@ using truyenthanhServerWeb.Services;
 
 namespace truyenthanhServerWeb.Controllers
 {
-
     [Authorize(Roles = "User")]
     public class UserController : Controller
     {
