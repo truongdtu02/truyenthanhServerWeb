@@ -109,7 +109,7 @@ namespace truyenthanhServerWeb.Models
             ControlChanged += SongControlHandler;
             indx = _indx;
             pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
-            Console.WriteLine("user {0} path: {1}", indx, pathSong);
+            //Console.WriteLine("user {0} path: {1}", indx, pathSong);
         }
 
         protected override void OnStarted()
