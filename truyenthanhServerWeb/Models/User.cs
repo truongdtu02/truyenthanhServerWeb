@@ -133,7 +133,7 @@ namespace truyenthanhServerWeb.Models
                         // khi nhận được gói tin nào sẽ lưu lại địa chỉ của tiến trình client
                         var length = socket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
                         Console.WriteLine("r {0}", length);
-                        OnReceived(length);
+                        HandleReceived(length);
                     }
                     catch (Exception ex)
                     {
@@ -145,7 +145,7 @@ namespace truyenthanhServerWeb.Models
             listenUDPThread.Start();
         }
 
-        private void OnReceived(int length)
+        private void HandleReceived(int length)
         {
             if(playState == ePlayState.running && length == 144) // ~ >= 144 min 48kbps
             {
