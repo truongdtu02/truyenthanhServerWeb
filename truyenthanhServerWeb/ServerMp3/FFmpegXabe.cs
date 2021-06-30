@@ -32,7 +32,7 @@ namespace truyenthanhServerWeb.ServerMp3
 
             //string outPath = Path.Combine("Song", "out.mp3");
             //string udpParam = "-f mp3 udp://127.0.0.1:" + port.ToString();
-            string outPath = "udp://127.0.0.1:" + port.ToString();
+            string outPath = "udp://127.0.0.1:12000";// + port.ToString();
 
             //Create new conversion object
             var conversion = FFmpeg.Conversions.New()
