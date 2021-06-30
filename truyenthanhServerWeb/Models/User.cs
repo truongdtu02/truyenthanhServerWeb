@@ -132,7 +132,7 @@ namespace truyenthanhServerWeb.Models
                     {
                         // khi nhận được gói tin nào sẽ lưu lại địa chỉ của tiến trình client
                         var length = socket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
-                        Console.WriteLine("r {0}", length);
+                        //Console.WriteLine("r {0}", length);
                         HandleReceived(length);
                     }
                     catch (Exception ex)
@@ -161,7 +161,7 @@ namespace truyenthanhServerWeb.Models
                             UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
-                            Console.WriteLine("s {0} {1}", dv.Name, packetLength);
+                            //Console.WriteLine("s {0} {1}", dv.Name, packetLength);
                         }
                     }
                     frameId++;
