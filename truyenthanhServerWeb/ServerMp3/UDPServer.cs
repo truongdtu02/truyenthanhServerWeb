@@ -169,6 +169,11 @@ namespace truyenthanhServerWeb.ServerMp3
             udpSocket.SendAsync(ep, buff, offset, length);
         }
 
+        public static void SendSync(EndPoint ep, byte[] buff, int offset, int length)
+        {
+            udpSocket.Send(ep, buff, offset, length);
+        }
+
     }
 
     class UDPsocket : UdpServer

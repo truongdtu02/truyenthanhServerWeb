@@ -158,7 +158,7 @@ namespace truyenthanhServerWeb.Models
                     {
                         if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
-                            UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            UDPServer.SendSync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Console.WriteLine("s {0} {1}", dv.Name, packetLength);
