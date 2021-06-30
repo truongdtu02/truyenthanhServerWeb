@@ -162,10 +162,11 @@ namespace truyenthanhServerWeb.ServerMp3
 
             //launch UDP server
             udpSocket = new UDPsocket(IPAddress.Any, portUDPBroadcast, intervalCheckRequestUDP);
+            //udpSocket.Start();
         }
-        public static void SendAsync(EndPoint ep, byte[] buff)
+        public static void SendAsync(EndPoint ep, byte[] buff, int offset, int length)
         {
-            udpSocket.SendAsync(ep, buff);
+            udpSocket.SendAsync(ep, buff, offset, length);
         }
 
     }

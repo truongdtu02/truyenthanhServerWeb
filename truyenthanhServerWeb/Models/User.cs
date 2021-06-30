@@ -15,7 +15,7 @@ using truyenthanhServerWeb.ServerMp3;
 
 namespace truyenthanhServerWeb.Models
 {
-    public class User : UdpServer
+    public class User : NetCoreServer.UdpClient
     {
         public Account account { get; set; }
         public int indx; //index in _userList
@@ -110,12 +110,13 @@ namespace truyenthanhServerWeb.Models
             account = _ac;
             pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
             //Console.WriteLine("user {0} path: {1}", indx, pathSong);
-            Start();
+            Connect();
         }
 
-        protected override void OnStarted()
+        protected override void OnConnected()
         {
             // Start receive datagrams
+            Console.WriteLine("UDP client {0} connected", indx);
             ReceiveAsync();
         }
 
@@ -135,8 +136,8 @@ namespace truyenthanhServerWeb.Models
                     {
                         if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
-                            //UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendADU);
-                            Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            //Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                         }
                     }
