@@ -20,8 +20,6 @@ namespace truyenthanhServerWeb.ServerMp3
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
             //await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official)
 
-            Console.WriteLine("Port using {0}", port);
-
             _bIsConversionRunning = true;
 
             var mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
@@ -30,6 +28,9 @@ namespace truyenthanhServerWeb.ServerMp3
             var audioStream = mediaInfo.AudioStreams.First();
 
             //string outPath = Path.Combine("Song", "out.mp3");
+            string udpParam = $"-f mp3 udp://127.0.0.1:{port}";
+
+            Console.WriteLine(udpParam);
 
             //Change some parameters of video stream
             audioStream
@@ -51,7 +52,7 @@ namespace truyenthanhServerWeb.ServerMp3
             //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
             //.SetPreset(ConversionPreset.UltraFast)
             //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
-            .AddParameter($"-f mp3 udp://127.0.0.1:{port}");
+            .AddParameter(udpParam);
             //.AddParameter("-f mp3 udp://127.0.0.1:11000");
 
             //Add log to OnProgress
