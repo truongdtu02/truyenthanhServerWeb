@@ -108,7 +108,7 @@ namespace truyenthanhServerWeb.Models
             Start();
             ControlChanged += SongControlHandler;
             indx = _indx;
-            pathSong = Path.Combine()
+            pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
         }
 
         protected override void OnStarted()

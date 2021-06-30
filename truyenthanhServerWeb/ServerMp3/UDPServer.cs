@@ -21,7 +21,7 @@ namespace truyenthanhServerWeb.ServerMp3
         private int portUDPBroadcast;
         private int portFFmpeg;//portUserFFmpegStartFrom
         private static string pathSong;
-        public string PathSong { get => pathSong; }
+        public static string PathSong { get => pathSong; }
         private static string _dataFile = @"appsettings.xml";
         private static string AdminPass;
         private static string[] typeFileSupport = new string[] { ".aac", ".mp3", ".m4a", ".wav", ".ogg", ".flac", ".wma" }; //aac, mp3, m4a, wav, ogg, flac, wma
