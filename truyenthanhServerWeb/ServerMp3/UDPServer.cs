@@ -21,6 +21,7 @@ namespace truyenthanhServerWeb.ServerMp3
         private int portUDPBroadcast;
         private int portFFmpeg;//portUserFFmpegStartFrom
         private static string pathSong;
+        public string PathSong { get => pathSong; }
         private static string _dataFile = @"appsettings.xml";
         private static string AdminPass;
         private static string[] typeFileSupport = new string[] { ".aac", ".mp3", ".m4a", ".wav", ".ogg", ".flac", ".wma" }; //aac, mp3, m4a, wav, ogg, flac, wma
@@ -82,7 +83,7 @@ namespace truyenthanhServerWeb.ServerMp3
             int tmpIndx = 0;
             foreach(Account ac in accountList)
             {
-                _userList.Add(new User(IPAddress.Loopback, portFFmpeg + tmpIndx) { account = ac, indx = tmpIndx });
+                _userList.Add(new User(IPAddress.Loopback, portFFmpeg + tmpIndx, tmpIndx) { account = ac });
 
                 //initialize list song
                 UpdateSong(tmpIndx);
@@ -111,8 +112,6 @@ namespace truyenthanhServerWeb.ServerMp3
 
         private static void UpdateSong(int tmpIndx)
         {
-            //check and initialize list song
-            _userList[tmpIndx].pathSong = Path.Combine(pathSong, tmpIndx.ToString());
             //check if song user folder is existed?
             if (!Directory.Exists(_userList[tmpIndx].pathSong))
             {

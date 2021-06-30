@@ -102,11 +102,13 @@ namespace truyenthanhServerWeb.Models
             }
         }
 
-        public User(IPAddress address, int port) : base(address, port)
+        public User(IPAddress address, int port, int _indx) : base(address, port)
         {
             ffmpegPort = port;
             Start();
             ControlChanged += SongControlHandler;
+            indx = _indx;
+            pathSong = Path.Combine()
         }
 
         protected override void OnStarted()
