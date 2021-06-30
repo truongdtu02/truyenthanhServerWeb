@@ -161,6 +161,7 @@ namespace truyenthanhServerWeb.Models
                             UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            Console.WriteLine("s {1}", dv.Name);
                         }
                     }
                     frameId++;
