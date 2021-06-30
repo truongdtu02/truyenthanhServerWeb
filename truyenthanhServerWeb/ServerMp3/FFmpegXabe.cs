@@ -48,11 +48,11 @@ namespace truyenthanhServerWeb.ServerMp3
                 //.SetOverwriteOutput(true)
                 //Disable multithreading
                 .UseMultiThread(true)
-                //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
-                //.SetPreset(ConversionPreset.UltraFast)
-                //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
-                .AddParameter($"-f mp3 udp://{IPAddress.Loopback}:{port}");
-            //.AddParameter("-f mp3 udp://127.0.0.1:11000");
+            //Set conversion preset. You have to chose between file size and quality of video and duration of conversion
+            //.SetPreset(ConversionPreset.UltraFast)
+            //.AddParameter("-f mp3 udp://127.0.0.1:" + port.ToString());
+            //.AddParameter($"-f mp3 udp://127.0.0.1:{port}");
+            .AddParameter("-f mp3 udp://127.0.0.1:11000");
 
             //Add log to OnProgress
             conversion.OnProgress += async (sender, args) =>
