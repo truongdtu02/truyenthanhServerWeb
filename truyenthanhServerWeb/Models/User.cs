@@ -127,15 +127,17 @@ namespace truyenthanhServerWeb.Models
             if(playState == ePlayState.running && size == 144) // ~ >= 144 min 48kbps
             {
                 //packet frame
-                byte[] sendADU = packet_udp_frameADU(buffer, (int)size);
+                int packetLength = packet_udp_frameADU(buffer, (int)size);
                 //sendAsync
-                if(sendADU != null)
+                if(packetLength > 0)
                 {
                     foreach (var dv in lDevice)
                     {
                         if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
-                            UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendADU);
+                            //UDPServer.SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendADU);
+                            Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                         }
                     }
                     frameId++;
@@ -154,7 +156,10 @@ namespace truyenthanhServerWeb.Models
             Console.WriteLine($"UDP FFmpeg {indx} : {error}");
         }
 
-        private byte[] packet_udp_frameADU(byte[] buffer, int size)
+        byte[] sendBuff = new byte[1000];
+
+        //return size of adu packet
+        private int packet_udp_frameADU(byte[] buffer, int size)
         {
             if (frameId == 1)
             {
@@ -163,23 +168,50 @@ namespace truyenthanhServerWeb.Models
             }
 
             byte[] aduFrame = aduConvert.ReadNextADUFrame(buffer, size);
-            if (aduFrame == null) return null;
+            if (aduFrame == null) return -1;
 
             int sizeOfADUpacket = aduFrame.Length + 2 + 4 + 4; //2B checksum, 4B id adu frame, 4B idSong
-            byte[] tmpADUpacket = new byte[sizeOfADUpacket];
             //copy adu id
-            System.Buffer.BlockCopy(BitConverter.GetBytes(frameId), 0, tmpADUpacket, 2, 4); //start from 1
+            System.Buffer.BlockCopy(BitConverter.GetBytes(frameId), 0, sendBuff, 2, 4); //start from 1
             //copy song id
-            System.Buffer.BlockCopy(BitConverter.GetBytes(songId), 0, tmpADUpacket, 2 + 4, 4);
+            System.Buffer.BlockCopy(BitConverter.GetBytes(songId), 0, sendBuff, 2 + 4, 4);
             //copy adu data
-            System.Buffer.BlockCopy(aduFrame, 0, tmpADUpacket, 2 + 4 + 4, aduFrame.Length);
+            System.Buffer.BlockCopy(aduFrame, 0, sendBuff, 2 + 4 + 4, aduFrame.Length);
             //checksum
-            UInt16 checkSum = CaculateChecksum(tmpADUpacket, 2, sizeOfADUpacket - 2);
+            UInt16 checkSum = CaculateChecksum(sendBuff, 2, sizeOfADUpacket - 2);
             //copy checksum
-            System.Buffer.BlockCopy(BitConverter.GetBytes(checkSum), 0, tmpADUpacket, 0, 2);
+            System.Buffer.BlockCopy(BitConverter.GetBytes(checkSum), 0, sendBuff, 0, 2);
 
-            return tmpADUpacket;
+            return sizeOfADUpacket;
         }
+
+
+        //private byte[] packet_udp_frameADU(byte[] buffer, int size)
+        //{
+        //    if (frameId == 1)
+        //    {
+        //        aduConvert.CheckFrame(buffer, size); //update mp3 frame infor
+        //        aduConvert.Reset();
+        //    }
+
+        //    byte[] aduFrame = aduConvert.ReadNextADUFrame(buffer, size);
+        //    if (aduFrame == null) return null;
+
+        //    int sizeOfADUpacket = aduFrame.Length + 2 + 4 + 4; //2B checksum, 4B id adu frame, 4B idSong
+        //    byte[] tmpADUpacket = new byte[sizeOfADUpacket];
+        //    //copy adu id
+        //    System.Buffer.BlockCopy(BitConverter.GetBytes(frameId), 0, tmpADUpacket, 2, 4); //start from 1
+        //    //copy song id
+        //    System.Buffer.BlockCopy(BitConverter.GetBytes(songId), 0, tmpADUpacket, 2 + 4, 4);
+        //    //copy adu data
+        //    System.Buffer.BlockCopy(aduFrame, 0, tmpADUpacket, 2 + 4 + 4, aduFrame.Length);
+        //    //checksum
+        //    UInt16 checkSum = CaculateChecksum(tmpADUpacket, 2, sizeOfADUpacket - 2);
+        //    //copy checksum
+        //    System.Buffer.BlockCopy(BitConverter.GetBytes(checkSum), 0, tmpADUpacket, 0, 2);
+
+        //    return tmpADUpacket;
+        //}
 
         private UInt16 CaculateChecksum(byte[] data, int offset, int length)
         {
