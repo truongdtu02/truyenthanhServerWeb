@@ -105,12 +105,12 @@ namespace truyenthanhServerWeb.Models
         public User(IPAddress address, int port, int _indx, Account _ac) : base(address, port)
         {
             ffmpegPort = port;
-            Start();
             ControlChanged += SongControlHandler;
             indx = _indx;
             account = _ac;
             pathSong = Path.Combine(UDPServer.PathSong, indx.ToString());
             //Console.WriteLine("user {0} path: {1}", indx, pathSong);
+            Start();
         }
 
         protected override void OnStarted()
@@ -124,7 +124,7 @@ namespace truyenthanhServerWeb.Models
             //Console.WriteLine("Incoming: " + Encoding.UTF8.GetString(buffer, (int)offset, (int)size));
             //Console.WriteLine("Incoming: {0} {1}", (int)offset, (int)size);
 
-            if(playState == ePlayState.running && size > 143) // ~ >= 144 min 48kbps
+            if(playState == ePlayState.running && size == 144) // ~ >= 144 min 48kbps
             {
                 //packet frame
                 byte[] sendADU = packet_udp_frameADU(buffer, (int)size);
@@ -143,7 +143,7 @@ namespace truyenthanhServerWeb.Models
             }
 
             if (size != 144) Console.WriteLine("error size {0}", size);
-
+            if(offset != 0) Console.WriteLine("error offset {0}", offset);
             // Echo the message back to the sender
             //SendAsync(endpoint, buffer, 0, size);
             ReceiveAsync();

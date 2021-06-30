@@ -68,7 +68,7 @@ namespace truyenthanhServerWeb.ServerMp3
             //Start conversion
             await conversion.Start(cancellationTokenSource.Token);
 
-            //cancellationTokenSource.Cancel();
+            cancellationTokenSource.Cancel();
 
             _bIsConversionRunning = false;
 
