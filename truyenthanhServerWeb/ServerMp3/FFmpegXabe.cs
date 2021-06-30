@@ -14,10 +14,13 @@ namespace truyenthanhServerWeb.ServerMp3
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private bool _bIsConversionRunning = false;
         internal bool bIsConversionRunning { get => _bIsConversionRunning; }
+
         public async Task convertMP3(string pathFile, int port)
         {
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
             //await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official)
+
+            Console.WriteLine("Port using {0}", port);
 
             _bIsConversionRunning = true;
 
