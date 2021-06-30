@@ -1,7 +1,6 @@
 ﻿@inject IWebHostEnvironment env
 @inject SongService _songService
 @implements IDisposable
-
 @*control song*@
 <div class="row">
     <div class="column">
@@ -158,8 +157,11 @@
 
         //fileUpload.Song.Size
         using var stream = fileUpload.Song.OpenReadStream(maxFileSize);
-        var path = $"{env.ContentRootPath}\\{pathUserSong}\\{fileUpload.Song.Name}";
-        //string path = Path.Combine(env.ContentRootPath, UDPServer.PathSong, fileUpload.Song.Name);
+        //var path = $"{env.ContentRootPath}\\{pathUserSong}\\{fileUpload.Song.Name}";
+        string path = Path.Combine(env.ContentRootPath, UDPServer.PathSong, fileUpload.Song.Name);
+        Console.WriteLine(path);
+        path = Path.Combine(env.ContentRootPath, pathUserSong, fileUpload.Song.Name);
+        Console.WriteLine(path);
         using var file = File.OpenWrite(path);
         var buffer = new byte[5 * 1024 * 1024];
         int bytesRead = 0;
