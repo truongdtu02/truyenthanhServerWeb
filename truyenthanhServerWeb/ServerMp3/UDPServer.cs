@@ -54,10 +54,10 @@ namespace truyenthanhServerWeb.ServerMp3
                     PassAdmin = "admin@2020",
                     PortUDPBroadcast = 2000,
                     PortFFmpeg = 11000,
-                    IntervalCheckRequestUDP = 5 // ~ 60s
+                    IntervalCheckRequestUDP = 60 // ~ 60s
                 };
-                using var stream = File.Create(_dataFile);
-                _serializer.Serialize(stream, _settingDB);
+                //using var stream = File.Create(_dataFile);
+                //_serializer.Serialize(stream, _settingDB);
             }
             else
             {
