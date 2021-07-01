@@ -96,6 +96,9 @@ namespace truyenthanhServerWeb.Models
                     {
                         await ffmpegXabe.convertMP3(songPath, ffmpegPort);
                         playState = ePlayState.idle;
+                        Thread.Sleep(1500);
+                        //play-back
+                        InvokeControlChangedEvent(Path.GetFileName(songPath), User.ePlayCtrl.play);
                     }
                     catch { }
                 });
