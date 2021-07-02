@@ -51,6 +51,8 @@ namespace truyenthanhServerWeb.Models
 
         ADU_frame aduConvert = new ADU_frame();
 
+        private NetCoreServer.UdpServer udpSendSocket;
+
         public void InvokeSongChangedEvent()
         {
             SongChanged?.Invoke(this, new SongChangedEventArgs());
@@ -115,6 +117,12 @@ namespace truyenthanhServerWeb.Models
 
         byte[] receiveBuffer = new byte[144]; //1 frame 48kbps
 
+
+        public void SetUdpSocketForUser(NetCoreServer.UdpServer _udpSendSocket)
+        {
+            udpSendSocket = _udpSendSocket;
+
+        }
         public User(int _indx, Account _ac)
         {
             ffmpegPort = UDPServer.PortFFmpeg + _indx;
@@ -148,6 +156,7 @@ namespace truyenthanhServerWeb.Models
             listenUDPThread.Start();
         }
 
+        public EndPoint testIPEndpoint = new IPEndPoint(IPAddress.Parse("27.67.28.121"), 51200);
         private void HandleReceived(int length)
         {
             if(playState == ePlayState.running && length == 144) // ~ >= 144 min 48kbps
@@ -161,11 +170,16 @@ namespace truyenthanhServerWeb.Models
                     {
                         if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
-                            UDPServer.SendSync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            //UDPServer.SendSync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //SendAsync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //Console.WriteLine("s {0} {1}", dv.Name, packetLength);
                         }
+                    }
+                    for(int i = 0; i < 300; i++)
+                    {
+                        udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
                     }
                     frameId++;
                 }

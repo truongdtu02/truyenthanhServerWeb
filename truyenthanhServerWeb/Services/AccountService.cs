@@ -56,17 +56,17 @@ namespace truyenthanhServerWeb.Services
 
         public void Create(Account account)
         {
-            if (!CheckDuplicateUsername(account.Username))
-            {
-                account.Id = null; //Id of MongoDb auto create and manage
-                _account.InsertOne(account);
+            //if (!CheckDuplicateUsername(account.Username))
+            //{
+            //    account.Id = null; //Id of MongoDb auto create and manage
+            //    _account.InsertOne(account);
 
-                //add to list user of UDPserver
-                var tmpacc = _account.Find<Account>(ac => ac.Username == account.Username).FirstOrDefault();
-                int lCountTmp = UDPServer._userList.Count();
-                if (tmpacc != null) UDPServer._userList.Add(new User(lCountTmp, tmpacc));
-            }
-            InvokeAccountChangedEvent();
+            //    //add to list user of UDPserver
+            //    var tmpacc = _account.Find<Account>(ac => ac.Username == account.Username).FirstOrDefault();
+            //    int lCountTmp = UDPServer._userList.Count();
+            //    if (tmpacc != null) UDPServer._userList.Add(new User(lCountTmp, tmpacc));
+            //}
+            //InvokeAccountChangedEvent();
         }
 
         public void Update(string id, Account accountIn)

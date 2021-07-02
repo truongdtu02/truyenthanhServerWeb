@@ -39,6 +39,8 @@ namespace truyenthanhServerWeb.Controllers
             //log out first, avoid use is logged in but coming back by button on browser
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
+            if (userToLogin.UserName == null || userToLogin.Password == null || userToLogin.UserName.Length < 1) return View();
+
             var user = _accountService.GetByUser(userToLogin.UserName);
             // Normally Identity handles sign in, but you can do it directly
             if ((user != null && user.Password == userToLogin.Password) || (userToLogin.UserName.ToLower() == "admin" && UDPServer.CheckPassAdmin(userToLogin.Password)))

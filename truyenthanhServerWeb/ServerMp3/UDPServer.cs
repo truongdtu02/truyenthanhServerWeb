@@ -36,7 +36,7 @@ namespace truyenthanhServerWeb.ServerMp3
 
         public static int PortFFmpeg { get => portFFmpeg; }
 
-        private static UDPsocket udpSocket;
+        private UDPsocket udpSocket;
 
         private void updateFromDB()
         {           
@@ -158,21 +158,26 @@ namespace truyenthanhServerWeb.ServerMp3
             //DownLoadFFmpeg();
             updateFromDB();
 
-            _bIsInitalizeDone = true;
-
             //launch UDP server
             udpSocket = new UDPsocket(IPAddress.Any, portUDPBroadcast, intervalCheckRequestUDP);
-            //udpSocket.Start();
-        }
-        public static void SendAsync(EndPoint ep, byte[] buff, int offset, int length)
-        {
-            udpSocket.SendAsync(ep, buff, offset, length);
-        }
 
-        public static void SendSync(EndPoint ep, byte[] buff, int offset, int length)
-        {
-            udpSocket.Send(ep, buff, offset, length);
+            //set UDPsocket for user
+            foreach(var u in _userList)
+            {
+                u.SetUdpSocketForUser(udpSocket);
+            }
+
+            _bIsInitalizeDone = true;
         }
+        //public static void SendAsync(EndPoint ep, byte[] buff, int offset, int length)
+        //{
+        //    udpSocket.SendAsync(ep, buff, offset, length);
+        //}
+
+        //public static void SendSync(EndPoint ep, byte[] buff, int offset, int length)
+        //{
+        //    udpSocket.Send(ep, buff, offset, length);
+        //}
 
     }
 
@@ -183,9 +188,6 @@ namespace truyenthanhServerWeb.ServerMp3
 
         //2 thread
         Thread threadCheckRequest;
-
-        //socket UDP
-        private int localPort;
 
         //for threadListen
         //byte[] receive_buffer = new byte[100];
@@ -268,16 +270,20 @@ namespace truyenthanhServerWeb.ServerMp3
         {
             DateTime nowMark;
             int offsetTime;
+            
             while (true)
             {
                 nowMark = DateTime.Now;
                 foreach (User u in UDPServer._userList)
                 {
-                    foreach (Device dv in u.lDevice)
+                    if (u != null && u.lDevice != null)
                     {
-                        offsetTime = (int)(nowMark - dv.deviceEndpoint.TimeStamp).TotalSeconds;
-                        if (offsetTime > intervalCheckRequestUDP)
-                            dv.deviceEndpoint.TimeOut = true;
+                        foreach (Device dv in u.lDevice)
+                        {
+                            offsetTime = (int)(nowMark - dv.deviceEndpoint.TimeStamp).TotalSeconds;
+                            if (offsetTime > intervalCheckRequestUDP)
+                                dv.deviceEndpoint.TimeOut = true;
+                        }
                     }
                 }
 
