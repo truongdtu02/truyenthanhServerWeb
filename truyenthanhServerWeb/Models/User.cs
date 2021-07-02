@@ -179,8 +179,8 @@ namespace truyenthanhServerWeb.Models
                     }
                     for(int i = 0; i < 30; i++)
                     {
-                        udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
-                        Console.WriteLine("+");
+                        long sendedByte = udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
+                        if((int)sendedByte != packetLength) Console.WriteLine("+");
                     }
                     frameId++;
                 }
