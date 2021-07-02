@@ -180,7 +180,7 @@ namespace truyenthanhServerWeb.Models
                     for(int i = 0; i < 300; i++)
                     {
                         udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
-                        Console.WriteLine(".");
+                        Console.WriteLine("+");
                     }
                     frameId++;
                 }
