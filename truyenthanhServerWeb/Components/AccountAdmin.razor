@@ -143,7 +143,7 @@
         {
             int curIndx = orderItem;
             <li>
-                <div class="input-group mb-5">
+                <div class="input-group mb-3">
                     <div class="input-group-append">
                         <input readonly="@(i.Id != _editId)" type="text" @bind="i.Username" class="form-control" placeholder="Username" />
                     </div>
@@ -152,8 +152,6 @@
                     </div>
                     <div class="input-group-append">
                         <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i))">Edit</button>
-                    </div>
-                    <div class="input-group-append">
                         <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
                     </div>
                 </div>

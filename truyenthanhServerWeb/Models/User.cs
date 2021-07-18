@@ -12,9 +12,18 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using truyenthanhServerWeb.ServerMp3;
+using Xabe.FFmpeg;
 
 namespace truyenthanhServerWeb.Models
 {
+    public class PlayingSongState
+    {
+        public string curSong;
+        public TimeSpan duration;
+        public TimeSpan curTimePlaying;
+        public bool PlayBack = false;
+        public bool PlayAll = false;
+    }
     public class User
     {
         public Account account { get; set; }
@@ -26,6 +35,12 @@ namespace truyenthanhServerWeb.Models
         //just three element
         public List<byte[]> lADUBuffer = new List<byte[]>() { new byte[1], new byte[1], new byte[1]};
 
+        //what changed to update in UI
+        public enum eChangedElement { lSong, playingSong};
+
+        //playing song state
+        PlayingSongState playingSongState = new PlayingSongState();
+
         //play control
         public enum ePlayCtrl { play, pause, stop};
         public enum ePlayState { idle, running, pause};
@@ -36,6 +51,7 @@ namespace truyenthanhServerWeb.Models
         public string pathSong;// = @"Data"; //combine with username in constructor
         public List<string> lSong = new List<string>();
 
+        //event update list song, playing song state in UI
         public event System.EventHandler<SongChangedEventArgs> SongChanged;
         public event System.EventHandler<ControlChangedEventArgs> ControlChanged;
 
@@ -53,13 +69,21 @@ namespace truyenthanhServerWeb.Models
 
         private NetCoreServer.UdpServer udpSendSocket;
 
-        public void InvokeSongChangedEvent()
+        public void InvokeListSongChangedEvent()
         {
-            SongChanged?.Invoke(this, new SongChangedEventArgs());
+            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.lSong, null));
         }
+
         public void InvokeControlChangedEvent(string _songName, User.ePlayCtrl _playCtrl)
         {
             ControlChanged?.Invoke(this, new ControlChangedEventArgs(_songName, _playCtrl));
+        }
+
+        //change play back, play all
+        public void PlayBackAllChange(bool _playBack, bool _playAll)
+        {
+            playingSongState.PlayBack = _playBack;
+            playingSongState.PlayAll = _playAll;
         }
 
         // handler song control
@@ -69,43 +93,93 @@ namespace truyenthanhServerWeb.Models
             {
                 if (playState == ePlayState.idle)
                 {
-                    PlayNewSong(Path.Combine(pathSong, args.SongName));
+                    playingSongState.curSong = args.SongName;
+                    frameId = 1;
+                    playState = ePlayState.running;
+                    PlayNewSong(args.SongName);
+                }
+                else if (playState == ePlayState.pause)
+                {
+                    PlayNewSong(playingSongState.curSong);
                 }
             }
-            else if (args.PlayCtrl == ePlayCtrl.stop)
+            else if (args.PlayCtrl == ePlayCtrl.pause)
+            {
+                if (ffmpegXabe != null && playState == ePlayState.running)
+                {
+                    playState = ePlayState.pause;
+                    ffmpegXabe.StopConversion();
+                }
+            }
+            else //if (args.PlayCtrl == ePlayCtrl.stop)
             {
                 if(ffmpegXabe != null)
                     ffmpegXabe.StopConversion();
+
+                //reset state
                 playState = ePlayState.idle;
             }
         }
 
-        private void PlayNewSong(string songPath)
+        //play new or resume old song
+        private void PlayNewSong(string selectedSongName)
         {
             ffmpegXabe = new FFmpegXabe();
-
+            string selectedSongPath = Path.Combine(pathSong, selectedSongName);
             //check song exits
-            if (File.Exists(songPath) && !ffmpegXabe.bIsConversionRunning)
+            if (File.Exists(selectedSongPath) && !ffmpegXabe.bIsConversionRunning)
             {
                 songId++;
                 if (songId == 0) songId = 1;
-                frameId = 1;
-                playState = ePlayState.running;
-
                 ffmpegThread = new Thread(async () =>
                 {
                     try
                     {
-                        await ffmpegXabe.convertMP3(songPath, ffmpegPort);
+                        IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(selectedSongPath);
+                        playingSongState.duration = mediaInfo.Duration;
+                        playingSongState.curTimePlaying = new TimeSpan(0);
+
+                        //path time begin
+                        if(aduConvert.TimePerFrame_ms <= 0)
+                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, 0);
+                        else
+                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms);
+
                         playState = ePlayState.idle;
-                        Thread.Sleep(1500);
-                        //play-back
-                        InvokeControlChangedEvent(Path.GetFileName(songPath), User.ePlayCtrl.play);
+                        Thread.Sleep(1500); //gap time between two song
+
+                        PlayNextSong();
                     }
-                    catch { }
+                    catch //(Exception ex)
+                    {
+                        //reset state
+                        if (playState == ePlayState.running)
+                        {
+                            playState = ePlayState.idle;
+                        }
+                        
+                        Thread.Sleep(1500); //gap time between two song
+
+                        //Console.WriteLine(ex);
+                    }
                 });
                 ffmpegThread.Start();
             }
+            else
+            {
+                //reset state
+                playState = ePlayState.idle;
+
+                //remove song from list
+                lSong.Remove(selectedSongPath);
+                InvokeListSongChangedEvent();
+            }
+        }
+
+        private void PlayNextSong()
+        {
+            //play-back
+            //InvokeControlChangedEvent(Path.GetFileName(songPath), User.ePlayCtrl.play);
         }
 
         //socket udp listen data from ffmpeg
@@ -116,7 +190,6 @@ namespace truyenthanhServerWeb.Models
         EndPoint remoteEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
         byte[] receiveBuffer = new byte[144]; //1 frame 48kbps
-
 
         public void SetUdpSocketForUser(NetCoreServer.UdpServer _udpSendSocket)
         {
@@ -156,7 +229,8 @@ namespace truyenthanhServerWeb.Models
             listenUDPThread.Start();
         }
 
-        public EndPoint testIPEndpoint = new IPEndPoint(IPAddress.Parse("27.67.28.121"), 51200);
+        //test bandwith
+        //public EndPoint testIPEndpoint = new IPEndPoint(IPAddress.Parse("27.67.28.121"), 51200);
         private void HandleReceived(int length)
         {
             if(playState == ePlayState.running && length == 144) // ~ >= 144 min 48kbps
@@ -177,15 +251,17 @@ namespace truyenthanhServerWeb.Models
                             //Console.WriteLine("s {0} {1}", dv.Name, packetLength);
                         }
                     }
-                    for(int i = 0; i < 30; i++)
-                    {
-                        long sendedByte = udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
-                        if((int)sendedByte != packetLength) Console.WriteLine("+");
-                    }
+                    //test bandwith
+                    //for(int i = 0; i < 30; i++)
+                    //{
+                    //    long sendedByte = udpSendSocket.Send(testIPEndpoint, sendBuff, 0, packetLength);
+                    //    if((int)sendedByte != packetLength) Console.WriteLine("+");
+                    //}
                     frameId++;
                 }
             }
 
+            //debug
             if (length != 144) Console.WriteLine("error size {0}", length);
         }
 
@@ -291,12 +367,14 @@ namespace truyenthanhServerWeb.Models
 
     public class SongChangedEventArgs : System.EventArgs
     {
-        //public List<Device> NewValue { get; }
-
-        //public DeviceChangedEventArgs(List<Device> newValue)
-        public SongChangedEventArgs()
+        public User.eChangedElement ChangedElement { get => changedElement; }
+        private User.eChangedElement changedElement;
+        public PlayingSongState PlayingSongState { get => playingSongState; }
+        private PlayingSongState playingSongState;
+        public SongChangedEventArgs(User.eChangedElement _changedElement, PlayingSongState _playingSongState)
         {
-            //this.NewValue = newValue;
+            changedElement = _changedElement;
+            playingSongState = _playingSongState;
         }
     }
 

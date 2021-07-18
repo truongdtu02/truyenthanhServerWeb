@@ -54,10 +54,10 @@
                 _user = _accountService.GetUserByUsername(userName);
                 if (_user != null)
                     _deviceList = _user.lDevice;
-                await InvokeAsync(() =>
-                {
-                    base.StateHasChanged();
-                });
+                //await InvokeAsync(() =>
+                //{
+                //    base.StateHasChanged();
+                //});
                 Console.Write(".");
             }), null, IntervalReload, IntervalReload);
 

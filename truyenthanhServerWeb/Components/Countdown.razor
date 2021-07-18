@@ -1,0 +1,29 @@
+﻿<h3>Countdown</h3>
+
+<p>@counter</p>
+<button @onclick="StartTimer">Start</button>
+
+@code {
+    private static System.Timers.Timer aTimer;
+    private int counter = 60;
+    public void StartTimer()
+    {
+        aTimer = new System.Timers.Timer(1000);
+        aTimer.Elapsed += CountDownTimer;
+        aTimer.Enabled = true;
+    }
+
+    public async void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (counter > 0)
+        {
+            counter -= 1;
+        }
+        else
+        {
+            aTimer.Enabled = false;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

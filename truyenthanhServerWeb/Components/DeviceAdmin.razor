@@ -129,25 +129,38 @@
         {
             foreach (var i in _deviceList)
             {
-                <li>
-                    <div class="input-group mb-5">
-                        <div class="input-group-append">
-                            <input readonly type="text" @bind="i.Id" class="form-control" placeholder="ID" />
-                        </div>
-                        <div class="input-group-append">
-                            <input readonly="@(i.Id != _editId)" type="text" @bind="i.Name" class="form-control" placeholder="Name" />
-                        </div>
-                        <div class="input-group-append">
-                            <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i.Id))">Edit</button>
-                        </div>
-                        <div class="input-group-append">
-                            <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
-                        </div>
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
-                        </div>
-                    </div>
-                </li>
+        <li>
+            <div class="input-group mb-3">
+                <div class="input-group-append">
+                    <input readonly type="text" @bind="i.Id" class="form-control" placeholder="ID" />
+                </div>
+                <div class="input-group-append">
+                    <input readonly="@(i.Id != _editId)" type="text" @bind="i.Name" class="form-control" placeholder="Name" />
+                </div>
+                <div class="input-group-append">
+                    <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i.Id))">Edit</button>
+                    <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
+                    <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
+                </div>
+            </div>
+            @*<div class="input-group mb-5">
+            <div class="input-group-append">
+                <input readonly type="text" @bind="i.Id" class="form-control" placeholder="ID" />
+            </div>
+            <div class="input-group-append">
+                <input readonly="@(i.Id != _editId)" type="text" @bind="i.Name" class="form-control" placeholder="Name" />
+            </div>
+            <div class="input-group-append">
+                <button disabled="@((_editId != null) && (i.Id != _editId))" class="btn btn-outline-danger" type="button" @onclick="@(e => Edit(i.Id))">Edit</button>
+            </div>
+            <div class="input-group-append">
+                <button disabled="@(i.Id != _editId)" class="btn btn-outline-danger" type="button" @onclick="@(e => Save(i))">Save</button>
+            </div>
+            <div class="input-group-append">
+                <button class="btn btn-outline-danger" type="button" @onclick="@(e => Remove(i))">Delete</button>
+            </div>
+        </div>*@
+        </li>
             }
         }
     }

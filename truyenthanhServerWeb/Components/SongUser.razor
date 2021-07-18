@@ -2,15 +2,19 @@
 @inject SongService _songService
 @implements IDisposable
 @*control song*@
-<div class="row">
+<div class="input-group-append">
     <div class="column">
-        <button @onclick="Play" class="btn btn-info" style="color:limegreen">Play</button>
-        <button @onclick="Pause" class="btn btn-info" style="color:orange">Pause</button>
-        <button @onclick="Stop" class="btn btn-info" style="color:red">Stop</button>
+        <button @onclick="Play" class="btn btn-outline-info" style="color:limegreen">Play</button>
+        <button @onclick="Pause" class="btn btn-outline-info" style="color:orange">Pause</button>
+        <button @onclick="Stop" class="btn btn-outline-info" style="color:red">Stop</button>
+        <input type="checkbox" checked=@(playingSongState.PlayBack) @onchange="@(eventArgs => { playingSongState.PlayBack = (bool)eventArgs.Value; PlayBackAll(); })">
+        <label> Phát lại</label>
+        <input type="checkbox" checked=@(playingSongState.PlayAll) @onchange="@(eventArgs => { playingSongState.PlayAll = (bool)eventArgs.Value; PlayBackAll(); })">
+        <label> Phát tất cả</label>
     </div>
     <div class="column"></div>
 </div>
-<h5 class="text-info">@selectedSong</h5>
+@*<h5 class="text-info">@selectedSong</h5>*@
 
 <br />
 
@@ -36,14 +40,15 @@
     <tbody>
         @foreach (var item in _lSong)
         {
-            <tr>
-                <td><a @onclick="@(e => SelectSong(item))" stryle="word-break:break-all">@item</a></td>
-                <td>
-                    <a @onclick="@(e => OrderUp(item))" class="btn btn-sm btn-outline-info">Lên</a>
-                    <a @onclick="@(e => OrderDown(item))" class="btn btn-sm btn-outline-warning">Xuống</a>
-                    <a @onclick="@(e => Delete(item))" class="btn btn-sm btn-outline-danger">Xoá</a>
-                </td>
-            </tr>
+        <tr>
+            @*<td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all">@item</a></td>*@
+            <td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all" style="font-weight:@(item == selectedSong ? "bold" : "normal")">@item</a></td>
+            <td>
+                <a @onclick="@(e => OrderUp(item))" class="btn btn-sm btn-outline-info">Lên</a>
+                <a @onclick="@(e => OrderDown(item))" class="btn btn-sm btn-outline-warning">Xuống</a>
+                <a @onclick="@(e => Delete(item))" class="btn btn-sm btn-outline-danger">Xoá</a>
+            </td>
+        </tr>
         }
         @*<tr><td colspan="5"><strong>Tổng số: @Model.Count()</strong></td></tr>*@
 
@@ -69,6 +74,7 @@
     private string selectedSong;
 
     private bool bIsUploading = false;
+    private PlayingSongState playingSongState = new PlayingSongState();
 
     protected override void OnInitialized()
     {
@@ -81,19 +87,24 @@
         int tmpUserIndx = _songService.UserIndx;
         if (tmpUserIndx != -1)
         {
-            UDPServer._userList[tmpUserIndx].SongChanged += UpdateListSong;
+            UDPServer._userList[tmpUserIndx].SongChanged += UpdateUI;
         }
     }
 
-    // The event handler, will update list song
-    private async void UpdateListSong(object sender, SongChangedEventArgs args)
+    // The event handler, will update list song, playing status
+    private async void UpdateUI(object sender, SongChangedEventArgs args)
     {
-        _lSong = _songService.Get();
-        //Console.WriteLine("new update");
-        await InvokeAsync(() =>
+        if (args.ChangedElement == User.eChangedElement.lSong)
         {
-            base.StateHasChanged();
-        });
+            _lSong = _songService.Get();
+
+        }
+        else if (args.ChangedElement == User.eChangedElement.playingSong)
+        {
+
+        }
+        //Console.WriteLine("new update");
+        await InvokeAsync(StateHasChanged);
     }
 
     public void SelectSong(string _song)
@@ -104,16 +115,23 @@
     //song control
     private void Play()
     {
-        _songService.Play(selectedSong);
+        if(selectedSong != null && _lSong.Contains(selectedSong))
+            _songService.Play(selectedSong);
     }
     private void Pause()
     {
-
+        _songService.Pause();
     }
     private void Stop()
     {
         _songService.Stop();
 
+    }
+
+    //play back, play all change
+    private void PlayBackAll()
+    {
+        _songService.PlayBackAllChange(playingSongState.PlayBack, playingSongState.PlayAll);
     }
 
     //change order

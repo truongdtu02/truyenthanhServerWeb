@@ -54,7 +54,7 @@ namespace MP3_ADU_namespace
         public int Frame_size { get => frame_size; }
 
         int start_frame = 0, end_frame = 0;
-        double timePerFrame_ms;
+        double timePerFrame_ms = 0;
         public double TimePerFrame_ms { get => timePerFrame_ms; }
         public int Start_frame { get => start_frame; }
         public int End_frame { get => end_frame; }

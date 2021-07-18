@@ -46,9 +46,10 @@ namespace truyenthanhServerWeb.Services
                 //synchronize between disk and lSong
                 Synchronize();
 
-                UDPServer._userList[_userIndx].InvokeSongChangedEvent();
+                UDPServer._userList[_userIndx].InvokeListSongChangedEvent();
             }
         }
+
         public string GetRootPath()
         {
             if(_userIndx != -1)
@@ -58,7 +59,7 @@ namespace truyenthanhServerWeb.Services
             return null;
         }
 
-        //change order in líst
+        //change order in list
         public void ChangeOrderUp(string _songName)
         {
             if (_userIndx != -1)
@@ -70,9 +71,10 @@ namespace truyenthanhServerWeb.Services
                     UDPServer._userList[_userIndx].lSong.Insert(tmpSongIndx - 1, _songName);
 
                 }
-                UDPServer._userList[_userIndx].InvokeSongChangedEvent();
+                UDPServer._userList[_userIndx].InvokeListSongChangedEvent();
             }
         }
+
         public void ChangeOrderDown(string _songName)
         {
             if (_userIndx != -1)
@@ -84,7 +86,7 @@ namespace truyenthanhServerWeb.Services
                     UDPServer._userList[_userIndx].lSong.Insert(tmpSongIndx + 1, _songName);
                 }
 
-                UDPServer._userList[_userIndx].InvokeSongChangedEvent();
+                UDPServer._userList[_userIndx].InvokeListSongChangedEvent();
             }
         }
 
@@ -110,7 +112,7 @@ namespace truyenthanhServerWeb.Services
                     }
                 }
 
-                UDPServer._userList[_userIndx].InvokeSongChangedEvent();
+                UDPServer._userList[_userIndx].InvokeListSongChangedEvent();
             }
         }
 
@@ -150,7 +152,6 @@ namespace truyenthanhServerWeb.Services
             }
         }
 
-
         //song control
         public void Play(string _songName)
         {
@@ -168,6 +169,11 @@ namespace truyenthanhServerWeb.Services
         {
             if (_userIndx != -1)
                 UDPServer._userList[_userIndx].InvokeControlChangedEvent(null, User.ePlayCtrl.stop);
+        }
+        public void PlayBackAllChange(bool _playBack, bool _playAll)
+        {
+            if (_userIndx != -1)
+                UDPServer._userList[_userIndx].PlayBackAllChange(_playBack, _playAll);
         }
     }
 }

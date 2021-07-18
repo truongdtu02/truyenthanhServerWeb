@@ -15,14 +15,15 @@ namespace truyenthanhServerWeb.ServerMp3
         private bool _bIsConversionRunning = false;
         internal bool bIsConversionRunning { get => _bIsConversionRunning; }
 
-        public async Task convertMP3(string pathFile, int port)
+        public async Task convertMP3(IMediaInfo mediaInfo, int port, uint startPosition_ms)
         {
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
             //await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official)
 
             _bIsConversionRunning = true;
 
-            IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
+            //IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
+            //TimeSpan dur = mediaInfo.Duration;
 
             //var videoStream = mediaInfo.VideoStreams.First();
             IStream audioStream = mediaInfo.AudioStreams.FirstOrDefault()?
@@ -36,7 +37,10 @@ namespace truyenthanhServerWeb.ServerMp3
 
             //Create new conversion object
             var conversion = FFmpeg.Conversions.New()
+                //conversion in realtime
                 .AddParameter("-re", ParameterPosition.PreInput)
+                //position begin
+                .AddParameter($"-ss {startPosition_ms/1000}", ParameterPosition.PreInput)
                 //Add audio stream to output file
                 .AddStream(audioStream)
                 //.SetOutputFormat(Format.mp3)
