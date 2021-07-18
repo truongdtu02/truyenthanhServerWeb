@@ -40,7 +40,7 @@ namespace truyenthanhServerWeb.ServerMp3
                 //conversion in realtime
                 .AddParameter("-re", ParameterPosition.PreInput)
                 //position begin
-                .AddParameter($"-ss {startPosition_ms/1000}", ParameterPosition.PreInput)
+                .AddParameter($"-ss {TimeSpan.FromSeconds(startPosition_ms/1000)}", ParameterPosition.PreInput)
                 //Add audio stream to output file
                 .AddStream(audioStream)
                 //.SetOutputFormat(Format.mp3)
@@ -56,11 +56,11 @@ namespace truyenthanhServerWeb.ServerMp3
             //.AddParameter(udpParam);
 
             //Add log to OnProgress
-            //conversion.OnProgress += async (sender, args) =>
-            //{
-            //    //Show all output from FFmpeg to console
-            //    await Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
-            //};
+            conversion.OnProgress += async (sender, args) =>
+            {
+                //Show all output from FFmpeg to console
+                await Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
+            };
 
             //conversion.OnProgress += (duration, length) => { currentProgress = duration; }
 

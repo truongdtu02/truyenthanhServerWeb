@@ -145,20 +145,21 @@ namespace truyenthanhServerWeb.Models
                         else
                             await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms);
 
-                        playState = ePlayState.idle;
                         Thread.Sleep(1500); //gap time between two song
+
+                        playState = ePlayState.idle;
 
                         PlayNextSong();
                     }
                     catch //(Exception ex)
                     {
+                        Thread.Sleep(1500); //gap time between two song
+
                         //reset state
                         if (playState == ePlayState.running)
                         {
                             playState = ePlayState.idle;
                         }
-                        
-                        Thread.Sleep(1500); //gap time between two song
 
                         //Console.WriteLine(ex);
                     }
