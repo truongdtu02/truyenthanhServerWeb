@@ -139,9 +139,11 @@ namespace truyenthanhServerWeb.Models
                         Console.WriteLine("pause: " + ex);
                     }
                 }
-
-                //reset state
-                playState = ePlayState.idle;
+                else
+                {
+                    //reset state
+                    playState = ePlayState.idle;
+                }
             }
         }
 
