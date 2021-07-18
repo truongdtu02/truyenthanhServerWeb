@@ -12,15 +12,15 @@ namespace truyenthanhServerWeb.ServerMp3
     public class FFmpegXabe
     {
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private bool _bIsConversionRunning = false;
-        internal bool bIsConversionRunning { get => _bIsConversionRunning; }
+        //private bool _bIsConversionRunning = false;
+        //internal bool bIsConversionRunning { get => _bIsConversionRunning; set => _bIsConversionRunning = value; }
 
         public async Task convertMP3(IMediaInfo mediaInfo, int port, uint startPosition_ms)
         {
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
             //await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official)
 
-            _bIsConversionRunning = true;
+            //_bIsConversionRunning = true;
 
             //IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
             //TimeSpan dur = mediaInfo.Duration;
@@ -72,8 +72,7 @@ namespace truyenthanhServerWeb.ServerMp3
             await conversion.Start(cancellationTokenSource.Token);
 
             cancellationTokenSource.Cancel();
-
-            _bIsConversionRunning = false;
+            //_bIsConversionRunning = false;
 
             //await Console.Out.WriteLineAsync($"Finished converion file [{nameFile}]");
         }
@@ -81,7 +80,7 @@ namespace truyenthanhServerWeb.ServerMp3
         public void StopConversion()
         {
             cancellationTokenSource.Cancel();
-            _bIsConversionRunning = false;
+            //_bIsConversionRunning = false;
         }
 
         //private async Task<MediaMetadata> GetVideoThumbnailAsync(IFormFile file, int frameTarget)

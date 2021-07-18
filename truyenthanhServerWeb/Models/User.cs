@@ -55,7 +55,7 @@ namespace truyenthanhServerWeb.Models
         public event System.EventHandler<SongChangedEventArgs> SongChanged;
         public event System.EventHandler<ControlChangedEventArgs> ControlChanged;
 
-        FFmpegXabe ffmpegXabe;// = new FFmpegXabe();
+        FFmpegXabe ffmpegXabe; //= new FFmpegXabe();
 
         private int ffmpegPort;
         public int FFmpegPort { get => ffmpegPort; }
@@ -87,8 +87,13 @@ namespace truyenthanhServerWeb.Models
         }
 
         // handler song control
+        private bool bIsSleepingGap = false; //sleep between two song
+        //private uint OldFrameId = 0; //save to resume
+
         private void SongControlHandler(object sender, ControlChangedEventArgs args)
         {
+            if (bIsSleepingGap) return;
+
             if (args.PlayCtrl == ePlayCtrl.play)
             {
                 if (playState == ePlayState.idle)
@@ -106,16 +111,34 @@ namespace truyenthanhServerWeb.Models
             }
             else if (args.PlayCtrl == ePlayCtrl.pause)
             {
-                if (ffmpegXabe != null && playState == ePlayState.running)
+                if (playState == ePlayState.running)
                 {
-                    playState = ePlayState.pause;
-                    ffmpegXabe.StopConversion();
+                    //OldFrameId = frameId;
+                    try
+                    {
+                        ffmpegXabe.StopConversion();
+                        while (playState != ePlayState.idle) ; //wait until idle
+                        playState = ePlayState.pause;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("pause: " + ex);
+                    }
                 }
             }
             else //if (args.PlayCtrl == ePlayCtrl.stop)
             {
-                if(ffmpegXabe != null)
-                    ffmpegXabe.StopConversion();
+                if (ffmpegXabe != null)
+                {
+                    try
+                    {
+                        ffmpegXabe.StopConversion();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("pause: " + ex);
+                    }
+                }
 
                 //reset state
                 playState = ePlayState.idle;
@@ -125,17 +148,21 @@ namespace truyenthanhServerWeb.Models
         //play new or resume old song
         private void PlayNewSong(string selectedSongName)
         {
-            ffmpegXabe = new FFmpegXabe();
+            //make sure ffmpeg is idle , before start new
+
             string selectedSongPath = Path.Combine(pathSong, selectedSongName);
             //check song exits
-            if (File.Exists(selectedSongPath) && !ffmpegXabe.bIsConversionRunning)
+            if (File.Exists(selectedSongPath))
             {
                 songId++;
                 if (songId == 0) songId = 1;
+
                 ffmpegThread = new Thread(async () =>
                 {
                     try
                     {
+                        ffmpegXabe = new FFmpegXabe();
+
                         IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(selectedSongPath);
                         playingSongState.duration = mediaInfo.Duration;
                         playingSongState.curTimePlaying = new TimeSpan(0);
@@ -147,22 +174,22 @@ namespace truyenthanhServerWeb.Models
                             await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms);
 
                         Thread.Sleep(1500); //gap time between two song
-
-                        playState = ePlayState.idle;
+                        ffmpegXabe = null;
 
                         PlayNextSong();
                     }
-                    catch //(Exception ex)
+                    catch (Exception ex)
                     {
-                        Thread.Sleep(1500); //gap time between two song
+                        bIsSleepingGap = true;
 
                         //reset state
-                        if (playState == ePlayState.running)
-                        {
-                            playState = ePlayState.idle;
-                        }
+                        playState = ePlayState.idle;
+                        ffmpegXabe = null;
 
-                        //Console.WriteLine(ex);
+                        Thread.Sleep(1500); //gap time between two song
+                        bIsSleepingGap = false;                      
+
+                        Console.WriteLine(ex);
                     }
                 });
                 ffmpegThread.Start();
