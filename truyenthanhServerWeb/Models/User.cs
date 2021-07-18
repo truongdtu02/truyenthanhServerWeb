@@ -100,6 +100,7 @@ namespace truyenthanhServerWeb.Models
                 }
                 else if (playState == ePlayState.pause)
                 {
+                    playState = ePlayState.running;
                     PlayNewSong(playingSongState.curSong);
                 }
             }
