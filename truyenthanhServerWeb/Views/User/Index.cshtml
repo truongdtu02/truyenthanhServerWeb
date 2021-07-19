@@ -9,7 +9,13 @@
 
 <br />
 
-<component type="typeof(SongUser)" render-mode="Server" />
+<div class="text-center alert-info">
+    <h3 class="display-4">Xin chao @Model.Username</h3>
+</div>
+
+<br />
+
+<component type="typeof(SongUser)" render-mode="Server" param-userName="@Model.Username" />
 
 <br />
 

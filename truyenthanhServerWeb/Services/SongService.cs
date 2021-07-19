@@ -11,19 +11,30 @@ namespace truyenthanhServerWeb.Services
 {
     public class SongService
     {
-        private readonly int _userIndx;
-        public int UserIndx { get => _userIndx; }
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public SongService(IHttpContextAccessor httpContextAccessor)
+        //private readonly int _userIndx;
+        //public int UserIndx { get => _userIndx; }
+        //private readonly IHttpContextAccessor _httpContextAccessor;
+        //public SongService(IHttpContextAccessor httpContextAccessor)
+        //{
+        //    _httpContextAccessor = httpContextAccessor;
+
+        //    string tmpUsrname = _httpContextAccessor.HttpContext.User.Identity.Name;
+        //    _userIndx = UDPServer._userList.FindLastIndex(x => x.account.Username == tmpUsrname);
+
+        //}
+        //
+
+        public SongService()
         {
-            _httpContextAccessor = httpContextAccessor;
 
-            string tmpUsrname = _httpContextAccessor.HttpContext.User.Identity.Name;
-            _userIndx = UDPServer._userList.FindLastIndex(x => x.account.Username == tmpUsrname);
+        }
 
-        }       
+        public int GetIndxByUsername(string userName)
+        {
+            return UDPServer._userList.FindLastIndex(x => x.account.Username == userName);
+        }
 
-        public List<string> Get()
+        public List<string> Get(int _userIndx)
         {
             if(_userIndx != -1)
             {
@@ -35,7 +46,7 @@ namespace truyenthanhServerWeb.Services
             }
         }
 
-        public void Add(string songName)
+        public void Add(string songName, int _userIndx)
         {
             if(_userIndx != -1)
             {
@@ -44,13 +55,13 @@ namespace truyenthanhServerWeb.Services
                     UDPServer._userList[_userIndx].lSong.Add(songName);
 
                 //synchronize between disk and lSong
-                Synchronize();
+                Synchronize(_userIndx);
 
                 UDPServer._userList[_userIndx].InvokeListSongChangedEvent();
             }
         }
 
-        public string GetRootPath()
+        public string GetRootPath(int _userIndx)
         {
             if(_userIndx != -1)
             {
@@ -60,7 +71,7 @@ namespace truyenthanhServerWeb.Services
         }
 
         //change order in list
-        public void ChangeOrderUp(string _songName)
+        public void ChangeOrderUp(string _songName, int _userIndx)
         {
             if (_userIndx != -1)
             {
@@ -75,7 +86,7 @@ namespace truyenthanhServerWeb.Services
             }
         }
 
-        public void ChangeOrderDown(string _songName)
+        public void ChangeOrderDown(string _songName, int _userIndx)
         {
             if (_userIndx != -1)
             {
@@ -90,7 +101,7 @@ namespace truyenthanhServerWeb.Services
             }
         }
 
-        public void Delete(string _songName)
+        public void Delete(string _songName, int _userIndx)
         {
             if (_userIndx != -1)
             {
@@ -117,7 +128,7 @@ namespace truyenthanhServerWeb.Services
         }
 
         //delete song is not both exist in lSong and disk
-        public void Synchronize()
+        public void Synchronize(int _userIndx)
         {
             List<string> saveSongInDisk = new List<string>();
             string tmpPathsong = UDPServer._userList[_userIndx].pathSong;
@@ -153,24 +164,24 @@ namespace truyenthanhServerWeb.Services
         }
 
         //song control
-        public void Play(string _songName)
+        public void Play(string _songName, int _userIndx)
         {
             if(_userIndx != -1)
             {
                 UDPServer._userList[_userIndx].InvokeControlChangedEvent(_songName, User.ePlayCtrl.play);
             }
         }
-        public void Pause()
+        public void Pause(int _userIndx)
         {
             if (_userIndx != -1)
                 UDPServer._userList[_userIndx].InvokeControlChangedEvent(null, User.ePlayCtrl.pause);
         }
-        public void Stop()
+        public void Stop(int _userIndx)
         {
             if (_userIndx != -1)
                 UDPServer._userList[_userIndx].InvokeControlChangedEvent(null, User.ePlayCtrl.stop);
         }
-        public void PlayBackAllChange(bool _playBack, bool _playAll)
+        public void PlayBackAllChange(bool _playBack, bool _playAll, int _userIndx)
         {
             if (_userIndx != -1)
                 UDPServer._userList[_userIndx].PlayBackAllChange(_playBack, _playAll);

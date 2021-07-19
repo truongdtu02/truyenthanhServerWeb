@@ -4,7 +4,7 @@
 
 <EditForm EditContext="editContext" OnValidSubmit="OnSubmit">
     <div class="form-group">
-        Song: <InputFile OnChange="OnChange" class="form-group"/>
+        Song: <InputFile OnChange="OnChange" class="form-group" />
         @{
             var progressCss = "progress" + (displayProgress ? "" : "d-none");
             var progressWidthStyle = progressPercent + "%";
@@ -22,27 +22,27 @@
 
 <table class="table table-hover" width="100%">
     @*<col style="width:40%">
-    <col style="width:15%">
-    <col style="width:15%">
-    <col style="width:15%">
-    <col style="width:15%">*@
+        <col style="width:15%">
+        <col style="width:15%">
+        <col style="width:15%">
+        <col style="width:15%">*@
     @*<thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Authors)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Publisher)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Year)
-            </th>
-            <th></th>
-        </tr>
-    </thead>*@
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Authors)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Publisher)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Year)
+                </th>
+                <th></th>
+            </tr>
+        </thead>*@
     <tbody>
         @foreach (var item in _lSong)
         {
@@ -61,6 +61,10 @@
 </table>
 
 @code {
+    [Parameter] public string userName { get; set; }
+
+    private int userIndx;
+
     private EditContext editContext;
     private FileUpload fileUpload;
     //for progress bar
@@ -85,20 +89,22 @@
         cancellation = new CancellationTokenSource();
         fileUpload = new FileUpload();
         editContext = new EditContext(fileUpload);
-        _lSong = _songService.Get();
-        pathUserSong = _songService.GetRootPath();
 
-        int tmpUserIndx = _songService.UserIndx;
-        if(tmpUserIndx != -1)
+        userIndx = _songService.GetIndxByUsername(userName);
+
+        _lSong = _songService.Get(userIndx);
+        pathUserSong = _songService.GetRootPath(userIndx);
+
+        if (userIndx != -1)
         {
-            UDPServer._userList[tmpUserIndx].SongChanged += UpdateListSong;
+            UDPServer._userList[userIndx].SongChanged += UpdateListSong;
         }
     }
 
     // The event handler, will update list song
     private async void UpdateListSong(object sender, SongChangedEventArgs args)
     {
-        _lSong = _songService.Get();
+        _lSong = _songService.Get(userIndx);
         //Console.WriteLine("new update");
         await InvokeAsync(() =>
         {
@@ -109,16 +115,16 @@
     //change order
     private void OrderUp(string item)
     {
-        _songService.ChangeOrderUp(item);
+        _songService.ChangeOrderUp(item, userIndx);
     }
     private void OrderDown(string item)
     {
-        _songService.ChangeOrderDown(item);
+        _songService.ChangeOrderDown(item, userIndx);
     }
     //delete
     private void Delete(string item)
     {
-        _songService.Delete(item);
+        _songService.Delete(item, userIndx);
     }
 
     private void OnChange(InputFileChangeEventArgs e)
@@ -164,7 +170,7 @@
         displayProgress = false;
 
         //add song to list
-        _songService.Add(fileUpload.Song.Name);
+        _songService.Add(fileUpload.Song.Name, userIndx);
 
         bIsUploading = false;
     }

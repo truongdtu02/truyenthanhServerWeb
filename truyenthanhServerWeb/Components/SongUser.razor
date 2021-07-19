@@ -56,6 +56,11 @@
 </table>
 
 @code {
+    [Parameter]
+    public string userName { get; set; }
+
+    private int userIndx;
+
     private EditContext editContext;
     private FileUpload fileUpload;
     //for progress bar
@@ -81,13 +86,15 @@
         cancellation = new CancellationTokenSource();
         fileUpload = new FileUpload();
         editContext = new EditContext(fileUpload);
-        _lSong = _songService.Get();
-        pathUserSong = _songService.GetRootPath();
 
-        int tmpUserIndx = _songService.UserIndx;
-        if (tmpUserIndx != -1)
+        userIndx = _songService.GetIndxByUsername(userName);
+
+        _lSong = _songService.Get(userIndx);
+        pathUserSong = _songService.GetRootPath(userIndx);
+
+        if (userIndx != -1)
         {
-            UDPServer._userList[tmpUserIndx].SongChanged += UpdateUI;
+            UDPServer._userList[userIndx].SongChanged += UpdateUI;
         }
     }
 
@@ -96,7 +103,7 @@
     {
         if (args.ChangedElement == User.eChangedElement.lSong)
         {
-            _lSong = _songService.Get();
+            _lSong = _songService.Get(userIndx);
 
         }
         else if (args.ChangedElement == User.eChangedElement.playingSong)
@@ -116,37 +123,37 @@
     private void Play()
     {
         if(selectedSong != null && _lSong.Contains(selectedSong))
-            _songService.Play(selectedSong);
+            _songService.Play(selectedSong, userIndx);
     }
     private void Pause()
     {
-        _songService.Pause();
+        _songService.Pause(userIndx);
     }
     private void Stop()
     {
-        _songService.Stop();
+        _songService.Stop(userIndx);
 
     }
 
     //play back, play all change
     private void PlayBackAll()
     {
-        _songService.PlayBackAllChange(playingSongState.PlayBack, playingSongState.PlayAll);
+        _songService.PlayBackAllChange(playingSongState.PlayBack, playingSongState.PlayAll, userIndx);
     }
 
     //change order
     private void OrderUp(string item)
     {
-        _songService.ChangeOrderUp(item);
+        _songService.ChangeOrderUp(item, userIndx);
     }
     private void OrderDown(string item)
     {
-        _songService.ChangeOrderDown(item);
+        _songService.ChangeOrderDown(item, userIndx);
     }
     //delete
     private void Delete(string item)
     {
-        _songService.Delete(item);
+        _songService.Delete(item, userIndx);
     }
 
     private void OnChange(InputFileChangeEventArgs e)
@@ -194,7 +201,7 @@
         displayProgress = false;
 
         //add song to list
-        _songService.Add(fileUpload.Song.Name);
+        _songService.Add(fileUpload.Song.Name, userIndx);
 
         bIsUploading = false;
     }
