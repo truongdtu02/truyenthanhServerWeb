@@ -97,6 +97,7 @@ namespace truyenthanhServerWeb.ServerMp3
             {
                 Process.Start("kill", "-s SIGSTOP " + processID);
             });
+            pauseT.Priority = ThreadPriority.Highest;
             pauseT.Start();
             //Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
             //Process.Start("echo", $"{processID}");
@@ -168,6 +169,7 @@ namespace truyenthanhServerWeb.ServerMp3
             {
                 Process.Start("kill", "-s SIGCONT " + processID);
             });
+            resumeT.Priority = ThreadPriority.Highest;
             resumeT.Start();
 
 
