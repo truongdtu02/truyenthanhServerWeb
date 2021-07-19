@@ -144,8 +144,7 @@ namespace truyenthanhServerWeb.ServerMp3
                     //    }
                     //}
 
-                    // Close process by sending a close message to its main window.
-                    myProcess.CloseMainWindow();
+                    myProcess.WaitForExit();
                     // Free resources associated with process.
                     myProcess.Close();
                     Console.WriteLine("Done pause");
