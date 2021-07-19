@@ -217,6 +217,7 @@ namespace truyenthanhServerWeb.Models
             string selectedSongPath = Path.Combine(pathSong, selectedSongName);
             ffmpegXabe = null; //clear
 
+            playState = ePlayState.running;
             //play-back
             InvokeControlChangedEvent(Path.GetFileName(selectedSongPath), User.ePlayCtrl.play);
         }
