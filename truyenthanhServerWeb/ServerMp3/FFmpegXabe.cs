@@ -127,27 +127,28 @@ namespace truyenthanhServerWeb.ServerMp3
                 using (Process myProcess = Process.Start("echo" , $"{processID}"))
                 {
                     // Display physical memory usage 5 times at intervals of 2 seconds.
-                    for (int i = 0; i < 5; i++)
-                    {
-                        if (!myProcess.HasExited)
-                        {
-                            // Discard cached information about the process.
-                            //myProcess.Refresh();
-                            // Print working set to console.
-                            Console.WriteLine($"Physical Memory Usage: ");
-                            // Wait 2 seconds.
-                            Thread.Sleep(2);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    //for (int i = 0; i < 5; i++)
+                    //{
+                    //    if (!myProcess.HasExited)
+                    //    {
+                    //        // Discard cached information about the process.
+                    //        //myProcess.Refresh();
+                    //        // Print working set to console.
+                    //        Console.WriteLine($"Physical Memory Usage: ");
+                    //        // Wait 2 seconds.
+                    //        Thread.Sleep(2);
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
 
                     // Close process by sending a close message to its main window.
                     myProcess.CloseMainWindow();
                     // Free resources associated with process.
                     myProcess.Close();
+                    Console.WriteLine("Done pause");
                 }
             }
             catch (Exception e)
