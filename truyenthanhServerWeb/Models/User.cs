@@ -116,9 +116,10 @@ namespace truyenthanhServerWeb.Models
                     //OldFrameId = frameId;
                     try
                     {
-                        ffmpegXabe.StopConversion();
-                        while (playState != ePlayState.idle) ; //wait until idle
-                        playState = ePlayState.pause;
+                        ffmpegXabe.SetSeek(0);
+                        //ffmpegXabe.StopConversion();
+                        //while (playState != ePlayState.idle) ; //wait until idle
+                        //playState = ePlayState.pause;
                     }
                     catch (Exception ex)
                     {

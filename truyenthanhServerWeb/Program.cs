@@ -25,17 +25,25 @@ namespace truyenthanhServerWeb
     {
         public static void Main(string[] args)
         {
-            var udpMp3Server = new UDPServer();
+            //get current OS
+            // Save the OS info to an variable
+            OperatingSystem os = Environment.OSVersion;
+            // Print the OS info to the console
+            Console.WriteLine($"platform:       {os.Platform}\n" +
+                              $"version:        {os.Version}\n" +
+                              $"version string: {os.VersionString}");
 
-            Thread hostweb = new Thread(() =>
-            {
-                //wait ultil UDPServer is done initialize
-                while (!udpMp3Server.bIsInitalizeDone) ;
-                CreateHostBuilder(args).Build().Run();
-            });
-            hostweb.Start();
+            //var udpMp3Server = new UDPServer();
 
-            udpMp3Server.Run();
+            //Thread hostweb = new Thread(() =>
+            //{
+            //    //wait ultil UDPServer is done initialize
+            //    while (!udpMp3Server.bIsInitalizeDone) ;
+            //    CreateHostBuilder(args).Build().Run();
+            //});
+            //hostweb.Start();
+
+            //udpMp3Server.Run();
 
             //CreateHostBuilder(args).Build().Run();
         }

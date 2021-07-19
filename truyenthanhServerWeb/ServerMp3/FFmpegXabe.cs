@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Xabe.FFmpeg;
 
 namespace truyenthanhServerWeb.ServerMp3
@@ -14,6 +15,8 @@ namespace truyenthanhServerWeb.ServerMp3
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         //private bool _bIsConversionRunning = false;
         //internal bool bIsConversionRunning { get => _bIsConversionRunning; set => _bIsConversionRunning = value; }
+
+        private IConversion conversion;
 
         public async Task convertMP3(IMediaInfo mediaInfo, int port, uint startPosition_ms)
         {
@@ -36,7 +39,7 @@ namespace truyenthanhServerWeb.ServerMp3
             string outPath = "udp://127.0.0.1:" + port.ToString();
 
             //Create new conversion object
-            var conversion = FFmpeg.Conversions.New()
+            conversion = FFmpeg.Conversions.New()
                 //conversion in realtime
                 .AddParameter("-re", ParameterPosition.PreInput)
                 //position begin
@@ -81,6 +84,11 @@ namespace truyenthanhServerWeb.ServerMp3
         {
             cancellationTokenSource.Cancel();
             //_bIsConversionRunning = false;
+        }
+
+        public void SetSeek(int _second)
+        {
+            conversion.SetSeek(TimeSpan.FromSeconds(_second));
         }
 
         //private async Task<MediaMetadata> GetVideoThumbnailAsync(IFormFile file, int frameTarget)
