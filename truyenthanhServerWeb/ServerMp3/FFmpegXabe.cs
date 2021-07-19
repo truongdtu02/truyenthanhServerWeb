@@ -99,7 +99,8 @@ namespace truyenthanhServerWeb.ServerMp3
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "/bin/bash",
-                    Arguments = $"kill -s SIGSTOP {processID}",
+                    //Arguments = $"kill -s SIGSTOP {processID}",
+                    Arguments = $"echo {processID}",
                     RedirectStandardOutput = false,
                     UseShellExecute = false,
                     CreateNoWindow = true,
