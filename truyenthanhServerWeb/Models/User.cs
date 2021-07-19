@@ -105,8 +105,9 @@ namespace truyenthanhServerWeb.Models
                 }
                 else if (playState == ePlayState.pause)
                 {
+                    ffmpegXabe.ResumeConversion();
                     playState = ePlayState.running;
-                    PlayNewSong(playingSongState.curSong);
+                    //PlayNewSong(playingSongState.curSong);
                 }
             }
             else if (args.PlayCtrl == ePlayCtrl.pause)
@@ -116,10 +117,13 @@ namespace truyenthanhServerWeb.Models
                     //OldFrameId = frameId;
                     try
                     {
-                        ffmpegXabe.SetSeek(0);
+                        ffmpegXabe.PauseConversion();
                         //ffmpegXabe.StopConversion();
                         //while (playState != ePlayState.idle) ; //wait until idle
-                        //playState = ePlayState.pause;
+                        bIsSleepingGap = true;
+                        playState = ePlayState.pause;
+                        Thread.Sleep(1500); //gap time between two song
+                        bIsSleepingGap = false;
                     }
                     catch (Exception ex)
                     {

@@ -18,6 +18,9 @@ namespace truyenthanhServerWeb.ServerMp3
 
         private IConversion conversion;
 
+        private long processID;
+        private double durationPercent = 0;
+
         public async Task convertMP3(IMediaInfo mediaInfo, int port, uint startPosition_ms)
         {
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
@@ -59,11 +62,13 @@ namespace truyenthanhServerWeb.ServerMp3
             //.AddParameter(udpParam);
 
             //Add log to OnProgress
-            conversion.OnProgress += async (sender, args) =>
+            conversion.OnProgress +=  (sender, args) =>
             {
                 //Show all output from FFmpeg to console
-                await Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
-            };
+                //Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
+                durationPercent = (args.Duration / args.TotalLength);
+                processID = args.ProcessId;
+             };
 
             //conversion.OnProgress += (duration, length) => { currentProgress = duration; }
 
@@ -84,6 +89,16 @@ namespace truyenthanhServerWeb.ServerMp3
         {
             cancellationTokenSource.Cancel();
             //_bIsConversionRunning = false;
+        }
+
+        public void PauseConversion()
+        {
+            Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
+        }
+
+        public void ResumeConversion()
+        {
+            Process.Start("/bin/bash", "kill -s SIGCONT " + processID);
         }
 
         public void SetSeek(int _second)
