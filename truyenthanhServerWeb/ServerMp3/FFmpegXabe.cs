@@ -94,7 +94,7 @@ namespace truyenthanhServerWeb.ServerMp3
         public void PauseConversion()
         {
             //Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
-            Process.Start("echo", $"{processID}");
+            //Process.Start("echo", $"{processID}");
             //using var process = new Process()
             //{
             //    StartInfo = new ProcessStartInfo
