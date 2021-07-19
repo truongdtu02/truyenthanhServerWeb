@@ -40,15 +40,15 @@
     <tbody>
         @foreach (var item in _lSong)
         {
-        <tr>
-            @*<td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all">@item</a></td>*@
-            <td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all" style="font-weight:@(item == selectedSong ? "bold" : "normal")">@item</a></td>
-            <td>
-                <a @onclick="@(e => OrderUp(item))" class="btn btn-sm btn-outline-info">Lên</a>
-                <a @onclick="@(e => OrderDown(item))" class="btn btn-sm btn-outline-warning">Xuống</a>
-                <a @onclick="@(e => Delete(item))" class="btn btn-sm btn-outline-danger">Xoá</a>
-            </td>
-        </tr>
+            <tr>
+                @*<td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all">@item</a></td>*@
+                <td @onclick="@(e => SelectSong(item))"><a stryle="word-break:break-all" style="font-weight:@(item == selectedSong ? "bold" : "normal")">@item</a></td>
+                <td>
+                    <a @onclick="@(e => OrderUp(item))" class="btn btn-sm btn-outline-info">Lên</a>
+                    <a @onclick="@(e => OrderDown(item))" class="btn btn-sm btn-outline-warning">Xuống</a>
+                    <a @onclick="@(e => Delete(item))" class="btn btn-sm btn-outline-danger">Xoá</a>
+                </td>
+            </tr>
         }
         @*<tr><td colspan="5"><strong>Tổng số: @Model.Count()</strong></td></tr>*@
 
@@ -104,11 +104,15 @@
         if (args.ChangedElement == User.eChangedElement.lSong)
         {
             _lSong = _songService.Get(userIndx);
-
         }
         else if (args.ChangedElement == User.eChangedElement.playingSong)
         {
 
+        }
+        else if (args.ChangedElement == User.eChangedElement.playBackAll)
+        {
+            playingSongState.PlayAll = args.PlayingSongState.PlayAll;
+            playingSongState.PlayBack = args.PlayingSongState.PlayBack;
         }
         //Console.WriteLine("new update");
         await InvokeAsync(StateHasChanged);
@@ -122,7 +126,7 @@
     //song control
     private void Play()
     {
-        if(selectedSong != null && _lSong.Contains(selectedSong))
+        if (selectedSong != null && _lSong.Contains(selectedSong))
             _songService.Play(selectedSong, userIndx);
     }
     private void Pause()

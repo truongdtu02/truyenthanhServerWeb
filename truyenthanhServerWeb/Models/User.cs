@@ -36,7 +36,7 @@ namespace truyenthanhServerWeb.Models
         public List<byte[]> lADUBuffer = new List<byte[]>() { new byte[1], new byte[1], new byte[1]};
 
         //what changed to update in UI
-        public enum eChangedElement { lSong, playingSong};
+        public enum eChangedElement { lSong, playingSong, playBackAll};
 
         //playing song state
         PlayingSongState playingSongState = new PlayingSongState();
@@ -84,6 +84,7 @@ namespace truyenthanhServerWeb.Models
         {
             playingSongState.PlayBack = _playBack;
             playingSongState.PlayAll = _playAll;
+            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.lSong, playingSongState));
         }
 
         // handler song control
