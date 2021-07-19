@@ -111,6 +111,17 @@ namespace truyenthanhServerWeb.ServerMp3
             //process.Start();
             //string result = process.StandardOutput.ReadToEnd();
             //process.WaitForExit();
+            try
+            {
+                using Process myProcess = Process.Start("echo", $"{processID}");
+                // Free resources associated with process.
+                myProcess.WaitForExit();
+                myProcess.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void ResumeConversion()
