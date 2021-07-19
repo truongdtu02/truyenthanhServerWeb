@@ -93,12 +93,43 @@ namespace truyenthanhServerWeb.ServerMp3
 
         public void PauseConversion()
         {
-            Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
+            //Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
+            using var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/bin/bash",
+                    Arguments = $"kill -s SIGSTOP {processID}",
+                    RedirectStandardOutput = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+
+            process.Start();
+            //string result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
         }
 
         public void ResumeConversion()
         {
-            Process.Start("/bin/bash", "kill -s SIGCONT " + processID);
+            //Process.Start("/bin/bash", "kill -s SIGCONT " + processID);
+
+            using var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/bin/bash",
+                    Arguments = $"kill -s SIGCONT {processID}",
+                    RedirectStandardOutput = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+
+            process.Start();
+            //string result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
         }
 
         public void SetSeek(int _second)
