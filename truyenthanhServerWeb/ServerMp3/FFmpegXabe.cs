@@ -115,7 +115,6 @@ namespace truyenthanhServerWeb.ServerMp3
             {
                 using Process myProcess = Process.Start("echo", $"{processID}");
                 // Free resources associated with process.
-                myProcess.WaitForExit();
                 myProcess.Close();
             }
             catch (Exception e)
