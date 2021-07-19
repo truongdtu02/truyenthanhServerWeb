@@ -183,7 +183,7 @@ namespace truyenthanhServerWeb.Models
                         Thread.Sleep(1500); //gap time between two song
                         ffmpegXabe = null;
 
-                        PlayNextSong();
+                        PlayNextSong(selectedSongName);
                     }
                     catch (Exception ex)
                     {
@@ -212,10 +212,13 @@ namespace truyenthanhServerWeb.Models
             }
         }
 
-        private void PlayNextSong()
+        private void PlayNextSong(string selectedSongName)
         {
+            string selectedSongPath = Path.Combine(pathSong, selectedSongName);
+            ffmpegXabe = null; //clear
+
             //play-back
-            //InvokeControlChangedEvent(Path.GetFileName(songPath), User.ePlayCtrl.play);
+            InvokeControlChangedEvent(Path.GetFileName(selectedSongPath), User.ePlayCtrl.play);
         }
 
         //socket udp listen data from ffmpeg
@@ -278,7 +281,14 @@ namespace truyenthanhServerWeb.Models
                 {
                     foreach (var dv in lDevice)
                     {
-                        if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
+                        if(dv.Name == "test")
+                        {
+                            for(int t = 0; t < 30; t++)
+                            {
+                                udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                            }
+                        }
+                        else if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
                             udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //UDPServer.SendSync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
