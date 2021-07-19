@@ -84,7 +84,7 @@ namespace truyenthanhServerWeb.Models
         {
             playingSongState.PlayBack = _playBack;
             playingSongState.PlayAll = _playAll;
-            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.lSong, playingSongState));
+            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playBackAll, playingSongState));
         }
 
         // handler song control
