@@ -42,7 +42,7 @@ namespace truyenthanhServerWeb.Models
         PlayingSongState playingSongState = new PlayingSongState();
 
         //play control
-        public enum ePlayCtrl { play, pause, stop};
+        public enum ePlayCtrl { play, pause, stop, next};
         public enum ePlayState { idle, running, pause};
         private ePlayCtrl playCtrl = ePlayCtrl.stop; //defaultvalue
         private ePlayState playState = ePlayState.idle; //defaultvalue
@@ -94,7 +94,15 @@ namespace truyenthanhServerWeb.Models
         {
             if (bIsSleepingGap) return;
 
-            if (args.PlayCtrl == ePlayCtrl.play)
+            if (args.PlayCtrl == ePlayCtrl.next)
+            {
+                playingSongState.curSong = args.SongName;
+                frameId = 1;
+                playState = ePlayState.running;
+                PlayNewSong(args.SongName);
+            }
+
+            else if (args.PlayCtrl == ePlayCtrl.play)
             {
                 if (playState == ePlayState.idle)
                 {
@@ -105,9 +113,9 @@ namespace truyenthanhServerWeb.Models
                 }
                 else if (playState == ePlayState.pause)
                 {
-                    ffmpegXabe.ResumeConversion();
+                    //ffmpegXabe.ResumeConversion();
                     playState = ePlayState.running;
-                    //PlayNewSong(playingSongState.curSong);
+                    PlayNewSong(playingSongState.curSong);
                 }
             }
             else if (args.PlayCtrl == ePlayCtrl.pause)
@@ -117,9 +125,9 @@ namespace truyenthanhServerWeb.Models
                     //OldFrameId = frameId;
                     try
                     {
-                        ffmpegXabe.PauseConversion();
-                        //ffmpegXabe.StopConversion();
-                        //while (playState != ePlayState.idle) ; //wait until idle
+                        //ffmpegXabe.PauseConversion();
+                        ffmpegXabe.StopConversion();
+                        while (playState != ePlayState.idle) ; //wait until idle
                         bIsSleepingGap = true;
                         playState = ePlayState.pause;
                         Thread.Sleep(1500); //gap time between two song
@@ -131,7 +139,7 @@ namespace truyenthanhServerWeb.Models
                     }
                 }
             }
-            else //if (args.PlayCtrl == ePlayCtrl.stop)
+            else if (args.PlayCtrl == ePlayCtrl.stop)
             {
                 if (ffmpegXabe != null)
                 {
@@ -185,7 +193,7 @@ namespace truyenthanhServerWeb.Models
 
                         PlayNextSong(selectedSongName);
                     }
-                    catch (Exception ex)
+                    catch //(Exception ex)
                     {
                         bIsSleepingGap = true;
 
@@ -196,7 +204,7 @@ namespace truyenthanhServerWeb.Models
                         Thread.Sleep(1500); //gap time between two song
                         bIsSleepingGap = false;                      
 
-                        Console.WriteLine(ex);
+                        //Console.WriteLine(ex);
                     }
                 });
                 ffmpegThread.Start();
@@ -217,9 +225,11 @@ namespace truyenthanhServerWeb.Models
             string selectedSongPath = Path.Combine(pathSong, selectedSongName);
             ffmpegXabe = null; //clear
 
-            playState = ePlayState.running;
+            //playState = ePlayState.idle;
             //play-back
-            InvokeControlChangedEvent(Path.GetFileName(selectedSongPath), User.ePlayCtrl.play);
+            InvokeControlChangedEvent(Path.GetFileName(selectedSongPath), User.ePlayCtrl.next);
+
+            //PlayNewSong(selectedSongName);
         }
 
         //socket udp listen data from ffmpeg
@@ -282,14 +292,15 @@ namespace truyenthanhServerWeb.Models
                 {
                     foreach (var dv in lDevice)
                     {
-                        if(dv.Name == "test")
-                        {
-                            for(int t = 0; t < 30; t++)
-                            {
-                                udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
-                            }
-                        }
-                        else if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
+                        //if(dv.Name == "test")
+                        //{
+                        //    for(int t = 0; t < 30; t++)
+                        //    {
+                        //        udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
+                        //    }
+                        //}
+                        //else 
+                        if (dv.deviceEndpoint.On && !dv.deviceEndpoint.TimeOut)
                         {
                             udpSendSocket.Send(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
                             //UDPServer.SendSync(dv.deviceEndpoint.IPEndPoint_client, sendBuff, 0, packetLength);
