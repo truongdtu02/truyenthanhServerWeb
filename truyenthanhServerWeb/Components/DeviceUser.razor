@@ -1,37 +1,52 @@
-﻿@inject AccountService _accountService
+﻿@inject DeviceService deviceService
+@inject AccountService accountService
 
 @code{
 
     //interval auto reload component in ms
     const int IntervalReload = 5000; // ~ 30s
-    private int userIndx;
-    private int userIndxInput;
 
     [Parameter]
     public string userName { get; set; }
 
-    private User _user;
-    private List<Device> _deviceList;
-    //[Required, MinLength(4), MaxLength(20)]
-    private string _inputName;
-    private string _inputId;
-    private string _editId = null;
+    private User user;
+    private List<Device> deviceList;
+    private int userIndx = -1;
 
     private bool bDuplicateId = false; //show error duplicate username
     private bool bOnInitialized = false;
 
+    private static System.Timers.Timer aTimer;
+
+    private void StartTimerRefresh()
+    {
+        aTimer = new System.Timers.Timer(IntervalReload);
+        aTimer.Elapsed += HandlerTimerRefresh;
+        aTimer.Enabled = true;
+    }
+
+    private async void HandlerTimerRefresh(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        deviceList = deviceService.GetByIndx(userIndx);
+        //Console.Write(".");
+        await InvokeAsync(StateHasChanged);
+    }
+
     protected override void OnInitialized()
     {
-        _user = _accountService.GetUserByUsername(userName);
-        if (_user != null)
-            _deviceList = _user.lDevice;
-        //userIndx = _user.indx;
-        _editId = null;
+        user = accountService.GetUserByUsername(userName);
+        if (user != null)
+        {
+            deviceList = user.lDevice;
+            userIndx = user.indx;
+        }
+
+        StartTimerRefresh();
 
         // Subscription to database record change events
         //DeviceService.DeviceChanged += UpdateNewDevices;
 
-        Console.WriteLine("User page");
+        //Console.WriteLine("DeviceUser.razor");
     }
 
     // The event handler, will update the HTML view according to new stock value
@@ -45,25 +60,39 @@
         });
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var timer = new Timer(new TimerCallback( async _ =>
-            {
-                _user = _accountService.GetUserByUsername(userName);
-                if (_user != null)
-                    _deviceList = _user.lDevice;
-                //await InvokeAsync(() =>
-                //{
-                //    base.StateHasChanged();
-                //});
-                Console.Write(".");
-            }), null, IntervalReload, IntervalReload);
+    //protected override void OnAfterRender(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        var timer = new Timer(new TimerCallback(async _ =>
+    //        {
+    //            user = accountService.GetUserByUsername(userName);
+    //            if (user != null)
+    //                deviceList = user.lDevice;
+    //            //await InvokeAsync(() =>
+    //            //{
+    //            //    base.StateHasChanged();
+    //            //});
+    //            Console.Write(".");
+    //        }), null, IntervalReload, IntervalReload);
 
-            Console.WriteLine("User page 1st after render");
+    //        Console.WriteLine("User page 1st after render");
+    //    }
+    //}
+
+    private void OnOffDevice(string _dvId)
+    {
+        int indxTmp = deviceList.FindLastIndex(dv => dv.Id == _dvId);
+        if (indxTmp != -1)
+        {
+            bool bTmp = deviceList[indxTmp].deviceEndpoint.On;
+            if (deviceService.OnOffDevice(userIndx, _dvId, !bTmp))
+            {
+                deviceList[indxTmp].deviceEndpoint.On = !bTmp;
+            }
         }
     }
+
 }
 
 <style>
@@ -110,12 +139,12 @@
         </tr>
     </thead>
     <tbody>
-        @if (_deviceList != null)
+        @if (deviceList != null)
         {
-            foreach (var i in _deviceList)
+            foreach (var i in deviceList)
             {
                 <tr>
-                    <td><span class="@(i.deviceEndpoint.On ? "dotOn" : "dotOff")"></span></td>
+                    <td><span class="@(i.deviceEndpoint.On ? "dotOn" : "dotOff")" @onclick="@(e => OnOffDevice(i.Id))"></span></td>
                     <td>@i.Name</td>
                     <td><span class="@(i.deviceEndpoint.TimeOut ? "dotOff" : "dotOn")"></span></td>
                 </tr>

@@ -26,13 +26,13 @@ namespace truyenthanhServerWeb
         public static OperatingSystem os;
         public static void Main(string[] args)
         {
-            //get current OS
-            // Save the OS info to an variable
-            os = Environment.OSVersion;
-            // Print the OS info to the console
-            Console.WriteLine($"platform:       {os.Platform}\n" +
-                              $"version:        {os.Version}\n" +
-                              $"version string: {os.VersionString}");
+            ////get current OS
+            //// Save the OS info to an variable
+            //os = Environment.OSVersion;
+            //// Print the OS info to the console
+            //Console.WriteLine($"platform:       {os.Platform}\n" +
+            //                  $"version:        {os.Version}\n" +
+            //                  $"version string: {os.VersionString}");
 
             var udpMp3Server = new UDPServer();
 

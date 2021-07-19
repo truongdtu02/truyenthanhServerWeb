@@ -34,7 +34,7 @@ namespace truyenthanhServerWeb.Services
         //get by index of user in _userList
         public List<Device> GetByIndx(int indx)
         {
-            if (indx < 0 && indx >= UDPServer._userList.Count) return null;
+            if (indx < 0 || indx >= UDPServer._userList.Count) return null;
             return UDPServer._userList[indx].lDevice;
         }
 
@@ -67,6 +67,21 @@ namespace truyenthanhServerWeb.Services
             }
 
             InvokeDeviceChangedEvent();
+        }
+
+        //on off device
+        public bool OnOffDevice(int indx, string dvId, bool stateOnOff)
+        {
+            if (indx >= 0 && indx < UDPServer._userList.Count)
+            {
+                int indxDvTmp = UDPServer._userList[indx].lDevice.FindLastIndex(dv => dv.Id == dvId);
+                if (indxDvTmp != -1)
+                {
+                    UDPServer._userList[indx].lDevice[indxDvTmp].deviceEndpoint.On = stateOnOff;
+                    return true;
+                }
+            }
+            return false;
         }
 
         //don't allow update Id and OwnerIndx of Device
