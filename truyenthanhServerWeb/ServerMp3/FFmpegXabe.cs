@@ -111,14 +111,48 @@ namespace truyenthanhServerWeb.ServerMp3
             //process.Start();
             //string result = process.StandardOutput.ReadToEnd();
             //process.WaitForExit();
+            //try
+            //{
+            //    using Process myProcess = Process.Start("echo", $"{processID}");
+            //    // Free resources associated with process.
+            //    myProcess.Close();
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //}
+
             try
             {
-                using Process myProcess = Process.Start("echo", $"{processID}");
-                // Free resources associated with process.
-                myProcess.Close();
+                using (Process myProcess = Process.Start("echo" , $"{processID}"))
+                {
+                    // Display physical memory usage 5 times at intervals of 2 seconds.
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (!myProcess.HasExited)
+                        {
+                            // Discard cached information about the process.
+                            //myProcess.Refresh();
+                            // Print working set to console.
+                            Console.WriteLine($"Physical Memory Usage: ");
+                            // Wait 2 seconds.
+                            Thread.Sleep(2);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    // Close process by sending a close message to its main window.
+                    myProcess.CloseMainWindow();
+                    // Free resources associated with process.
+                    myProcess.Close();
+                }
             }
             catch (Exception e)
             {
+                Console.WriteLine("The following exception was raised: ");
                 Console.WriteLine(e.Message);
             }
         }
