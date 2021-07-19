@@ -16,6 +16,13 @@
 </div>
 @*<h5 class="text-info">@selectedSong</h5>*@
 
+@if (playingSongState.curState != User.ePlayState.idle)
+{
+    <br />
+    <div>@(playingSongState.curState == User.ePlayState.running ? "Đang phát: " : "Tạm dừng: ") @playingSongState.curSong</div>
+    <div>@playingSongState.curTimePlaying / @playingSongState.duration</div>
+}
+
 <br />
 
 <EditForm EditContext="editContext" OnValidSubmit="OnSubmit">
@@ -98,6 +105,22 @@
         }
     }
 
+    private static System.Timers.Timer aTimer;
+
+    private void StartTimer()
+    {
+        aTimer = new System.Timers.Timer(1000);
+        aTimer.Elapsed += HandlerTimer;
+        aTimer.Enabled = true;
+    }
+
+    private async void HandlerTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        playingSongState.curTimePlaying += TimeSpan.FromSeconds(1);
+        //Console.Write(".");
+        await InvokeAsync(StateHasChanged);
+    }
+
     // The event handler, will update list song, playing status
     private async void UpdateUI(object sender, SongChangedEventArgs args)
     {
@@ -107,7 +130,18 @@
         }
         else if (args.ChangedElement == User.eChangedElement.playingSong)
         {
-
+            playingSongState = args.PlayingSongState;
+            if(playingSongState.curState == User.ePlayState.running)
+            {
+                StartTimer();
+            }
+            else
+            {
+                if(aTimer != null)
+                {
+                    aTimer.Stop();
+                }
+            }
         }
         else if (args.ChangedElement == User.eChangedElement.playBackAll)
         {

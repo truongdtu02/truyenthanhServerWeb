@@ -23,6 +23,7 @@ namespace truyenthanhServerWeb.Models
         public TimeSpan curTimePlaying;
         public bool PlayBack = false;
         public bool PlayAll = false;
+        public User.ePlayState curState = User.ePlayState.idle;
     }
     public class User
     {
@@ -43,8 +44,8 @@ namespace truyenthanhServerWeb.Models
 
         //play control
         public enum ePlayCtrl { play, pause, stop, next};
-        public enum ePlayState { idle, running, pause};
-        private ePlayCtrl playCtrl = ePlayCtrl.stop; //defaultvalue
+        public enum ePlayState { idle, running, pause, prepause};
+        //private ePlayCtrl playCtrl = ePlayCtrl.stop; //defaultvalue
         private ePlayState playState = ePlayState.idle; //defaultvalue
 
         //list song in path song
@@ -97,7 +98,6 @@ namespace truyenthanhServerWeb.Models
 
             if (args.PlayCtrl == ePlayCtrl.next)
             {
-                playingSongState.curSong = args.SongName;
                 frameId = 1;
                 playState = ePlayState.running;
                 PlayNewSong(args.SongName);
@@ -107,7 +107,6 @@ namespace truyenthanhServerWeb.Models
             {
                 if (playState == ePlayState.idle)
                 {
-                    playingSongState.curSong = args.SongName;
                     frameId = 1;
                     playState = ePlayState.running;
                     PlayNewSong(args.SongName);
@@ -123,15 +122,20 @@ namespace truyenthanhServerWeb.Models
             {
                 if (playState == ePlayState.running)
                 {
-                    //OldFrameId = frameId;
                     try
                     {
-                        //ffmpegXabe.PauseConversion();
-                        ffmpegXabe.StopConversion();
-                        while (playState != ePlayState.idle) ; //wait until idle
                         bIsSleepingGap = true;
-                        playState = ePlayState.pause;
+                        playState = ePlayState.prepause;
+
+                        playingSongState.curState = playState;
+                        SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playingSong, playingSongState));
+
+                        ffmpegXabe.StopConversion();
                         Thread.Sleep(1500); //gap time between two song
+
+                        //notification playing song state changed
+                        playState = ePlayState.pause;
+
                         bIsSleepingGap = false;
                     }
                     catch (Exception ex)
@@ -153,10 +157,13 @@ namespace truyenthanhServerWeb.Models
                         Console.WriteLine("pause: " + ex);
                     }
                 }
-                else
+                if(playState != ePlayState.idle)
                 {
                     //reset state
                     playState = ePlayState.idle;
+                    playingSongState.curState = playState;
+                    //notification playing song state changed
+                    SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playingSong, playingSongState));
                 }
             }
         }
@@ -180,11 +187,23 @@ namespace truyenthanhServerWeb.Models
                         ffmpegXabe = new FFmpegXabe();
 
                         IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(selectedSongPath);
-                        playingSongState.duration = mediaInfo.Duration;
-                        playingSongState.curTimePlaying = new TimeSpan(0);
+                        playingSongState.curSong = selectedSongName;
+                        playingSongState.duration = TimeSpan.FromSeconds((long)mediaInfo.Duration.TotalSeconds);
+                        if (aduConvert.TimePerFrame_ms <= 0)
+                        {
+                            playingSongState.curTimePlaying = TimeSpan.Zero;
+                        }
+                        else
+                        {
+                            playingSongState.curTimePlaying = TimeSpan.FromSeconds((long)(frameId * aduConvert.TimePerFrame_ms / 1000));
+                        }
+                        playingSongState.curState = playState;
+
+                        //notification playing song state changed
+                        SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playingSong, playingSongState));
 
                         //path time begin
-                        if(aduConvert.TimePerFrame_ms <= 0)
+                        if (aduConvert.TimePerFrame_ms <= 0)
                             await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, 0);
                         else
                             await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms);
@@ -196,14 +215,21 @@ namespace truyenthanhServerWeb.Models
                     }
                     catch //(Exception ex)
                     {
-                        bIsSleepingGap = true;
-
                         //reset state
-                        playState = ePlayState.idle;
                         ffmpegXabe = null;
+                        if (playState != ePlayState.prepause)
+                        {
+                            bIsSleepingGap = true;
 
-                        Thread.Sleep(1500); //gap time between two song
-                        bIsSleepingGap = false;                      
+                            playState = ePlayState.idle;
+                            //notification playing song state changed
+                            playingSongState.curState = playState;
+                            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playingSong, playingSongState));
+
+                            Thread.Sleep(1500); //gap time between two song
+
+                            bIsSleepingGap = false;
+                        }
 
                         //Console.WriteLine(ex);
                     }

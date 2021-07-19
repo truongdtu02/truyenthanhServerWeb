@@ -42,6 +42,7 @@ namespace truyenthanhServerWeb
                 while (!udpMp3Server.bIsInitalizeDone) ;
                 CreateHostBuilder(args).Build().Run();
             });
+            hostweb.Priority = ThreadPriority.Highest;
             hostweb.Start();
 
             udpMp3Server.Run();
