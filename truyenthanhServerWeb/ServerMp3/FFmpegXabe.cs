@@ -93,6 +93,11 @@ namespace truyenthanhServerWeb.ServerMp3
 
         public void PauseConversion()
         {
+            Thread pauseT = new Thread(() =>
+            {
+                Process.Start("kill", "-s SIGSTOP " + processID);
+            });
+            pauseT.Start();
             //Process.Start("/bin/bash", "kill -s SIGSTOP " + processID);
             //Process.Start("echo", $"{processID}");
             //using var process = new Process()
@@ -122,60 +127,67 @@ namespace truyenthanhServerWeb.ServerMp3
             //    Console.WriteLine(e.Message);
             //}
 
-            try
-            {
-                using (Process myProcess = Process.Start("echo" , $"{processID}"))
-                {
-                    // Display physical memory usage 5 times at intervals of 2 seconds.
-                    //for (int i = 0; i < 5; i++)
-                    //{
-                    //    if (!myProcess.HasExited)
-                    //    {
-                    //        // Discard cached information about the process.
-                    //        //myProcess.Refresh();
-                    //        // Print working set to console.
-                    //        Console.WriteLine($"Physical Memory Usage: ");
-                    //        // Wait 2 seconds.
-                    //        Thread.Sleep(2);
-                    //    }
-                    //    else
-                    //    {
-                    //        break;
-                    //    }
-                    //}
+            //try
+            //{
+            //    using (Process myProcess = Process.Start("echo" , $"{processID}"))
+            //    {
+            //        // Display physical memory usage 5 times at intervals of 2 seconds.
+            //        //for (int i = 0; i < 5; i++)
+            //        //{
+            //        //    if (!myProcess.HasExited)
+            //        //    {
+            //        //        // Discard cached information about the process.
+            //        //        //myProcess.Refresh();
+            //        //        // Print working set to console.
+            //        //        Console.WriteLine($"Physical Memory Usage: ");
+            //        //        // Wait 2 seconds.
+            //        //        Thread.Sleep(2);
+            //        //    }
+            //        //    else
+            //        //    {
+            //        //        break;
+            //        //    }
+            //        //}
 
-                    myProcess.WaitForExit();
-                    // Free resources associated with process.
-                    myProcess.Close();
-                    Console.WriteLine("Done pause");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The following exception was raised: ");
-                Console.WriteLine(e.Message);
-            }
+            //        myProcess.WaitForExit();
+            //        // Free resources associated with process.
+            //        myProcess.Close();
+            //        Console.WriteLine("Done pause");
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("The following exception was raised: ");
+            //    Console.WriteLine(e.Message);
+            //}
         }
 
         public void ResumeConversion()
         {
+            Thread resumeT = new Thread(() =>
+            {
+                Process.Start("kill", "-s SIGCONT " + processID);
+            });
+            resumeT.Start();
+
+
             //Process.Start("/bin/bash", "kill -s SIGCONT " + processID);
 
-            using var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/bin/bash",
-                    Arguments = $"kill -s SIGCONT {processID}",
-                    RedirectStandardOutput = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                }
-            };
+            //using var process = new Process()
+            //{
+            //    StartInfo = new ProcessStartInfo
+            //    {
+            //        FileName = "/bin/bash",
+            //        Arguments = $"kill -s SIGCONT {processID}",
+            //        RedirectStandardOutput = false,
+            //        UseShellExecute = false,
+            //        CreateNoWindow = true,
+            //    }
+            //};
 
-            process.Start();
-            //string result = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
+            //process.Start();
+            ////string result = process.StandardOutput.ReadToEnd();
+            //process.WaitForExit();
         }
 
         public void SetSeek(int _second)
