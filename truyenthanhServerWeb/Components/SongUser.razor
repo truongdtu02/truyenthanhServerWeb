@@ -99,19 +99,39 @@
         _lSong = _songService.Get(userIndx);
         pathUserSong = _songService.GetRootPath(userIndx);
 
+        playingSongState = _songService.GetPlayState(userIndx);
+        if (playingSongState.curState == User.ePlayState.running)
+        {
+            StartTimer();
+        }
+        else
+        {
+            if (aTimer != null)
+            {
+                aTimer.Stop();
+            }
+        }
+
         if (userIndx != -1)
         {
             UDPServer._userList[userIndx].SongChanged += UpdateUI;
         }
     }
 
-    private System.Timers.Timer aTimer;
+    private static System.Timers.Timer aTimer;
 
     private void StartTimer()
     {
-        aTimer = new System.Timers.Timer(1000);
-        aTimer.Elapsed += HandlerTimer;
-        aTimer.Enabled = true;
+        if (aTimer == null)
+        {
+            aTimer = new System.Timers.Timer(1000);
+            aTimer.Elapsed += HandlerTimer;
+            aTimer.Enabled = true;
+        }
+        else
+        {
+            aTimer.Start();
+        }
     }
 
     private async void HandlerTimer(Object source, System.Timers.ElapsedEventArgs e)
@@ -127,6 +147,8 @@
         if (args.ChangedElement == User.eChangedElement.lSong)
         {
             _lSong = _songService.Get(userIndx);
+            await InvokeAsync(StateHasChanged);
+
         }
         else if (args.ChangedElement == User.eChangedElement.playingSong)
         {
@@ -147,9 +169,9 @@
         {
             playingSongState.PlayAll = args.PlayingSongState.PlayAll;
             playingSongState.PlayBack = args.PlayingSongState.PlayBack;
+            await InvokeAsync(StateHasChanged);
         }
         //Console.WriteLine("new update");
-        await InvokeAsync(StateHasChanged);
     }
 
     public void SelectSong(string _song)

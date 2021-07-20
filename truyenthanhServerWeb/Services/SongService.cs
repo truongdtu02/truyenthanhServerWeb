@@ -70,6 +70,15 @@ namespace truyenthanhServerWeb.Services
             return null;
         }
 
+        public PlayingSongState GetPlayState(int _userIndx)
+        {
+            if (_userIndx != -1)
+            {
+                return UDPServer._userList[_userIndx].PlayingSongState;
+            }
+            return null;
+        }
+
         //change order in list
         public void ChangeOrderUp(string _songName, int _userIndx)
         {
