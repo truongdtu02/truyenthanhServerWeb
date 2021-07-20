@@ -36,12 +36,12 @@ namespace truyenthanhServerWeb
             //                  $"version:        {os.Version}\n" +
             //                  $"version string: {os.VersionString}");
 
-            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
-                FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg","win","bin"));
-            else
-                FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg", "unix"));
+            //if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+            //    FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg","win","bin"));
+            //else
+            //    FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg", "unix"));
 
-            string pp = FFmpeg.ExecutablesPath;
+            //string pp = FFmpeg.ExecutablesPath;
 
             var udpMp3Server = new UDPServer();
 
