@@ -21,14 +21,14 @@ namespace truyenthanhServerWeb.ServerMp3
         //private long processID;
         //private double durationPercent = 0;
 
-        public async Task convertMP3(IMediaInfo mediaInfo, int port, uint startPosition_ms)
+        public async Task convertMP3(IMediaInfo _mediaInfo, int port, uint startPosition_ms, string pathFile)
         {
             //Get latest version of FFmpeg. It's great idea if you don't know if you had installed FFmpeg.
             //await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official)
 
             //_bIsConversionRunning = true;
 
-            //IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
+            var mediaInfo = await FFmpeg.GetMediaInfo(pathFile);
             //TimeSpan dur = mediaInfo.Duration;
 
             //var videoStream = mediaInfo.VideoStreams.First();
@@ -62,13 +62,13 @@ namespace truyenthanhServerWeb.ServerMp3
             //.AddParameter(udpParam);
 
             //Add log to OnProgress
-            //conversion.OnProgress +=  (sender, args) =>
-            //{
-            //    //Show all output from FFmpeg to console
-            //    //Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
-            //    durationPercent = (args.Duration / args.TotalLength);
-            //    processID = args.ProcessId;
-            // };
+            conversion.OnProgress += (sender, args) =>
+            {
+               //Show all output from FFmpeg to console
+               Console.Out.WriteLineAsync($"[{args.Duration}/{args.TotalLength}][{args.Percent}%]");
+               //durationPercent = (args.Duration / args.TotalLength);
+               //processID = args.ProcessId;
+            };
 
             //conversion.OnProgress += (duration, length) => { currentProgress = duration; }
 

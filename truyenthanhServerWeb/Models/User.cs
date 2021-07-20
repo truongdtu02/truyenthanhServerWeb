@@ -185,10 +185,11 @@ namespace truyenthanhServerWeb.Models
                     try
                     {
                         ffmpegXabe = new FFmpegXabe();
-
                         IMediaInfo mediaInfo = await FFmpeg.GetMediaInfo(selectedSongPath);
+                        //mediaInfo.AudioStreams.FirstOrDefault()?.Duration
                         playingSongState.curSong = selectedSongName;
-                        playingSongState.duration = TimeSpan.FromSeconds((long)mediaInfo.Duration.TotalSeconds);
+                        //playingSongState.duration = TimeSpan.FromSeconds((long)mediaInfo.Duration.TotalSeconds);
+                        playingSongState.duration = TimeSpan.FromSeconds((long)mediaInfo.AudioStreams.FirstOrDefault()?.Duration.TotalSeconds);
                         if (aduConvert.TimePerFrame_ms <= 0)
                         {
                             playingSongState.curTimePlaying = TimeSpan.Zero;
@@ -204,16 +205,16 @@ namespace truyenthanhServerWeb.Models
 
                         //path time begin
                         if (aduConvert.TimePerFrame_ms <= 0)
-                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, 0);
+                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, 0, selectedSongPath);
                         else
-                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms);
+                            await ffmpegXabe.convertMP3(mediaInfo, ffmpegPort, frameId * (uint)aduConvert.TimePerFrame_ms, selectedSongPath);
 
                         Thread.Sleep(1500); //gap time between two song
                         ffmpegXabe = null;
 
                         PlayNextSong(selectedSongName);
                     }
-                    catch //(Exception ex)
+                    catch (Exception ex)
                     {
                         //reset state
                         ffmpegXabe = null;
@@ -231,7 +232,7 @@ namespace truyenthanhServerWeb.Models
                             bIsSleepingGap = false;
                         }
 
-                        //Console.WriteLine(ex);
+                        Console.WriteLine(ex.Message);
                     }
                 });
                 ffmpegThread.Start();

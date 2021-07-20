@@ -4,11 +4,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using truyenthanhServerWeb.ServerMp3;
 using truyenthanhServerWeb.Services;
+using Xabe.FFmpeg;
 
 namespace truyenthanhServerWeb
 {
@@ -33,6 +35,11 @@ namespace truyenthanhServerWeb
             //Console.WriteLine($"platform:       {os.Platform}\n" +
             //                  $"version:        {os.Version}\n" +
             //                  $"version string: {os.VersionString}");
+
+            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+                FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg","win","bin"));
+
+            string pp = FFmpeg.ExecutablesPath;
 
             var udpMp3Server = new UDPServer();
 
