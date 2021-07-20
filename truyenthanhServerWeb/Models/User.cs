@@ -296,6 +296,13 @@ namespace truyenthanhServerWeb.Models
                         var length = socket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
                         //Console.WriteLine("r {0}", length);
                         HandleReceived(length);
+
+                        //notification to update timing play
+                        if (((frameId * aduConvert.TimePerFrame_ms) - (uint)playingSongState.curTimePlaying.TotalMilliseconds) > 1000)
+                        {
+                            playingSongState.curTimePlaying += TimeSpan.FromSeconds(1);
+                            SongChanged?.Invoke(this, new SongChangedEventArgs(User.eChangedElement.playingSong, playingSongState));
+                        }
                     }
                     catch (Exception ex)
                     {
