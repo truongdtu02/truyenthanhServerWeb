@@ -38,6 +38,8 @@ namespace truyenthanhServerWeb
 
             if(Environment.OSVersion.Platform == PlatformID.Win32NT)
                 FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg","win","bin"));
+            else
+                FFmpeg.SetExecutablesPath(Path.Combine("FFmpeg", "unix"));
 
             string pp = FFmpeg.ExecutablesPath;
 
